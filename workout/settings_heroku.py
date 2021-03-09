@@ -1,10 +1,10 @@
 from workout.settings import *
 
+import dj_database_url
+
 DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL')
-        )
-    }
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+}
 
 DOMAIN = os.environ.get('DOMAIN', None)
 HEROKU_APP_NAME = os.environ.get('HEROKU_APP_NAME', None)
