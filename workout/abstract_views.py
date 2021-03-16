@@ -38,4 +38,3 @@ class FormView(ABC, TemplateView):
 
     def get_success_redirect(self, model_object):
         return None
-

@@ -32,6 +32,3 @@ class ActivityEdit(ActivityCreate):
         if activity.org != self.request.user.org:
             raise PermissionDenied()
         return activity
-
-
-
