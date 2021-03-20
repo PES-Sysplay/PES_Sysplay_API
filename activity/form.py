@@ -4,25 +4,27 @@ from django import forms
 
 from activity.models import Activity
 from workout.mixins import BootstrapFormMixin
+from workout.utils import get_fields
+
+bootstrap_field_info = {'TITLE': {'fields': [{'name': 'name', 'space': 12},
+                                             {'name': 'description', 'space': 12},
+                                             {'name': 'photo', 'space': 12},
+                                             {'name': 'activity_type', 'space': 12},
+                                             {'name': 'start_date', 'space': 12},
+                                             {'name': 'start_time', 'space': 12},
+                                             {'name': 'duration', 'space': 12},
+                                             {'name': 'normal_price', 'space': 12},
+                                             {'name': 'member_price', 'space': 12},
+                                             {'name': 'number_participants', 'space': 12},
+                                             {'name': 'status', 'space': 12},
+                                             {'name': 'location', 'space': 12},
+                                             {'name': 'only_member', 'space': 12}], 'description': 'DESCRIPTION'}, }
 
 
 class ActivityForm(BootstrapFormMixin, forms.ModelForm):
-
+    bootstrap_field_info = bootstrap_field_info
     start_date = forms.DateField(initial=datetime.now(), widget=forms.SelectDateWidget())
     start_time = forms.TimeField(initial=datetime.now())
-
-    bootstrap_field_info = {'TITLE': {'fields': [{'name': 'name', 'space': 12},
-                                                 {'name': 'description', 'space': 12},
-                                                 {'name': 'photo', 'space': 12},
-                                                 {'name': 'start_date', 'space': 12},
-                                                 {'name': 'start_time', 'space': 12},
-                                                 {'name': 'duration', 'space': 12},
-                                                 {'name': 'normal_price', 'space': 12},
-                                                 {'name': 'member_price', 'space': 12},
-                                                 {'name': 'number_participants', 'space': 12},
-                                                 {'name': 'status', 'space': 12},
-                                                 {'name': 'location', 'space': 12},
-                                                 {'name': 'only_member', 'space': 12}], 'description': 'DESCRIPTION'}, }
 
     def clean(self):
         cleaned_data = super().clean()
@@ -34,8 +36,7 @@ class ActivityForm(BootstrapFormMixin, forms.ModelForm):
 
     class Meta:
         model = Activity
-        fields = ('name', 'description', 'photo', 'start_time', 'duration', 'normal_price', 'member_price',
-                  'number_participants', 'status', 'location', 'only_member')
+        fields = get_fields(bootstrap_field_info)
         labels = {
             'name': 'Nombre de la actividad',
             'description': 'Descripción',
