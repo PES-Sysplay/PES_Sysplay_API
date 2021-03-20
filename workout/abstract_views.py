@@ -28,7 +28,7 @@ class FormView(ABC, TemplateView):
 
     def post(self, request, *args, **kwargs):
         model_object = self.get_model_object()
-        form = self.form_class(request.POST, instance=model_object)
+        form = self.form_class(request.POST, request.FILES, instance=model_object)
         if form.is_valid():
             model_object = form.save()
             return self.get_success_redirect(model_object=model_object)

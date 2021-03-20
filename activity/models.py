@@ -7,7 +7,7 @@ class Activity(models.Model):
     #   de momento porque no deja hacer migration (pide que se de un valor default)
     name = models.CharField(primary_key=True, max_length=20)
     description = models.CharField(max_length=100)
-    photo = models.FileField(validators=[validate_file_extension], null=True)
+    photo = models.FileField(validators=[validate_file_extension], upload_to="activity", null=True)
     start_time = models.DateTimeField()
     duration = models.FloatField()
     normal_price = models.FloatField()

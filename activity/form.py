@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django import forms
 
 from activity.models import Activity
@@ -5,9 +7,14 @@ from workout.mixins import BootstrapFormMixin
 
 
 class ActivityForm(BootstrapFormMixin, forms.ModelForm):
+
+    start_date = forms.DateField(initial=datetime.now(), widget=forms.SelectDateWidget())
+    start_time = forms.TimeField(initial=datetime.now())
+
     bootstrap_field_info = {'TITLE': {'fields': [{'name': 'name', 'space': 12},
                                                  {'name': 'description', 'space': 12},
                                                  {'name': 'photo', 'space': 12},
+                                                 {'name': 'start_date', 'space': 12},
                                                  {'name': 'start_time', 'space': 12},
                                                  {'name': 'duration', 'space': 12},
                                                  {'name': 'normal_price', 'space': 12},
@@ -16,6 +23,14 @@ class ActivityForm(BootstrapFormMixin, forms.ModelForm):
                                                  {'name': 'status', 'space': 12},
                                                  {'name': 'location', 'space': 12},
                                                  {'name': 'only_member', 'space': 12}], 'description': 'DESCRIPTION'}, }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date = cleaned_data.get("start_date")
+        time = cleaned_data.get("start_time")
+        date_time = datetime.combine(date, time)
+        cleaned_data.update({"start_time": date_time})
+        return cleaned_data
 
     class Meta:
         model = Activity
@@ -37,7 +52,6 @@ class ActivityForm(BootstrapFormMixin, forms.ModelForm):
         }
 
         widgets = {
-            'start_time': forms.SelectDateWidget(),
             'duration': forms.NumberInput(attrs={'id': 'form_homework', 'step': "0.01"}),
             'normal_price': forms.NumberInput(attrs={'id': 'form_homework', 'step': "0.01"}),
             'member_price': forms.NumberInput(attrs={'id': 'form_homework', 'step': "0.01"})
