@@ -3,7 +3,11 @@
     <form method='post' enctype="multipart/form-data">
     {% csrf_token %}
     {% include 'include/bootstrap_form.html' with form=form %}
-    <button type="submit" class="btn btn-block btn-success">Crear actividad!</button>
+    {% if form.is_read_only %}
+        <a href="{% url "edit_activity" form.instance.pk %}" class="btn btn-block btn-success">Editar Actividad</a>
+    {% else %}
+        <button type="submit" class="btn btn-block btn-success">Guardar Actividad!</button>
+    {% endif %}
     </form>
 
 {% endblock %}

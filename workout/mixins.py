@@ -9,6 +9,13 @@ class BootstrapFormMixin:
             field.disabled = True
 
     @property
+    def is_read_only(self):
+        for field in self.fields.values():
+            if field.disabled:
+                return True
+        return False
+
+    @property
     def get_fields(self):
         result = self.bootstrap_field_info
         for list_fields in result.values():

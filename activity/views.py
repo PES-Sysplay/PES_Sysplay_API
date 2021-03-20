@@ -21,14 +21,27 @@ class ActivityCreate(FormView):
     form_class = ActivityForm
 
     def get_success_redirect(self, model_object):
-        return redirect(reverse('activity_detail'))
+        return redirect(reverse('view_activity', args=[model_object.pk]))
+
+
+class ActivityView(ActivityCreate):
+    template_name = 'create_activity.html'
+    form_class = ActivityForm
+
+    def set_form(self, form):
+        form.set_read_only()
+
+    def get_model_object(self):
+        m_id = self.kwargs.get("id")
+        activity = get_object_or_404(Activity, pk=m_id)
+        return activity
 
 
 class ActivityEdit(ActivityCreate):
 
     def get_model_object(self, *args, **kwargs):
-        pk = self.kwargs.get('pk', default='')
-        activity = get_object_or_404(Activity, pk=pk)
-        if activity.org != self.request.user.org:
-            raise PermissionDenied()
+        m_id = self.kwargs.get('id')
+        activity = get_object_or_404(Activity, pk=m_id)
+        #if activity.org != self.request.user.org:
+        #    raise PermissionDenied()
         return activity
