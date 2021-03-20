@@ -1,4 +1,3 @@
-from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.views.generic import TemplateView
@@ -42,6 +41,6 @@ class ActivityEdit(ActivityCreate):
     def get_model_object(self, *args, **kwargs):
         m_id = self.kwargs.get('id')
         activity = get_object_or_404(Activity, pk=m_id)
-        #if activity.org != self.request.user.org:
-        #    raise PermissionDenied()
+        # if activity.org != self.request.user.org:
+        #     raise PermissionDenied()
         return activity
