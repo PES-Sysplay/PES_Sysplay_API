@@ -44,5 +44,6 @@ class ActivityForm(BootstrapFormMixin, forms.ModelForm):
             'normal_price': forms.NumberInput(attrs={'id': 'form_homework', 'step': "0.01"}),
             'member_price': forms.NumberInput(attrs={'id': 'form_homework', 'step': "0.01"}),
             'start_date': forms.SelectDateWidget(),
-            'start_time': forms.TimeInput(format="%H:%M")
+            'start_time': forms.TimeInput(format="%H:%M"),
+            'description': forms.Textarea(attrs={'row': 7}),
         }
