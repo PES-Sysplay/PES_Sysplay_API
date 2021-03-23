@@ -5,11 +5,11 @@
         {% if zone.description %}
             <p>{{ zone.description }}</p>
         {% endif %}
-        <div class="form-item row">
+        <div class="row margin-top">
         {% for field in zone.fields %}
             {% if field.new_row %}
         </div>
-        <div class="form-item row">
+        <div class="row margin-top">
             {% endif %}
                 <div class="col-{{ field.space }}">
                     {% bootstrap_field field.field %}

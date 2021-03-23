@@ -1,13 +1,16 @@
 {% extends "base_navbar.html" %}
 {% block body %}
-    <form method='post' enctype="multipart/form-data">
-    {% csrf_token %}
-    {% include 'include/bootstrap_form.html' with form=form %}
-    {% if form.is_read_only %}
-        <a href="{% url "edit_activity" form.instance.pk %}" class="button btn btn-block btn-success">Editar Actividad</a>
-    {% else %}
-        <button type="submit" class="button btn btn-block btn-success">Guardar Actividad!</button>
-    {% endif %}
-    </form>
-
+    <div class="row justify-content-md-center">
+        <div class="col-10">
+            <form method='post' enctype="multipart/form-data">
+            {% csrf_token %}
+            {% include 'include/bootstrap_form.html' with form=form %}
+            {% if form.is_read_only %}
+                <a href="{% url "edit_activity" form.instance.pk %}" class="button btn btn-block btn-success">Editar Actividad</a>
+            {% else %}
+                <button type="submit" class="button btn btn-block btn-success">Guardar Actividad!</button>
+            {% endif %}
+            </form>
+        </div>
+    </div>
 {% endblock %}
