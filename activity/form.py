@@ -5,17 +5,17 @@ from workout.mixins import BootstrapFormMixin
 from workout.utils import get_fields
 
 bootstrap_field_info = {'': {'fields': [{'name': 'name', 'space': 12},
-                                             {'name': 'description', 'space': 12},
-                                             {'name': 'photo', 'space': 12},
-                                             {'name': 'activity_type', 'space': 12},
-                                             {'name': 'start_date', 'space': 12},
-                                             {'name': 'start_time', 'space': 12},
-                                             {'name': 'duration', 'space': 12},
-                                             {'name': 'normal_price', 'space': 12},
-                                             {'name': 'member_price', 'space': 12},
-                                             {'name': 'number_participants', 'space': 12},
-                                             {'name': 'location', 'space': 12},
-                                             {'name': 'only_member', 'space': 12}], 'description': ''}, }
+                                        {'name': 'description', 'space': 12},
+                                        {'name': 'photo', 'space': 12},
+                                        {'name': 'activity_type', 'space': 12},
+                                        {'name': 'start_date', 'space': 12},
+                                        {'name': 'start_time', 'space': 12},
+                                        {'name': 'duration', 'space': 12},
+                                        {'name': 'normal_price', 'space': 12},
+                                        {'name': 'member_price', 'space': 12},
+                                        {'name': 'number_participants', 'space': 12},
+                                        {'name': 'location', 'space': 12},
+                                        {'name': 'only_member', 'space': 12}], 'description': ''}, }
 
 
 class ActivityForm(BootstrapFormMixin, forms.ModelForm):
