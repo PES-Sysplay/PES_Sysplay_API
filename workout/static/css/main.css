@@ -26,45 +26,40 @@ ul {
 .navbar {
   font-size: 17px;
   display: flex;
-  justify-content: space-between;
-  height: 60px;
-  padding: 20px 40px 0 0;
+  padding: 0% 4% 0% 0;
+  border-bottom: 3px solid rgba(80, 110, 181, 0.4);
+  margin: 1% 0 2.5%;
  }
 
 .nav-logo {
-  width: 55px;
-  margin-left: 15px;
+  width: 5.5%;
+  margin-left: 0.5%;
 }
 
 .navbar-name{
     text-decoration: none;
     font-family: 'Lobster', cursive;
     font-size: 28px;
-    padding: 25px 45px 12px 0;
+    padding: 2% 5% 0% 1%;
     color: #506EB5;
 }
 
 .nav-item{
+    padding-top: 1%;
     padding-right: 10px;
 }
 
-hr {
-  border: 2px solid #506EB5;
-  margin: 10px 0 35px;
-}
-
-.nav-link {
-    border-bottom: 1px solid rgba(1,1,1,0);
-}
-
-.nav-link:not(.active):hover {
-  border-bottom: 1px solid #506EB5;
+.nav-link:hover{
   color: #506EB5;
 }
 
-.nav-link.active{
-  border-bottom: 1px solid #506EB5;
-  color: #506EB5;
+ .active{
+    border-bottom: 2px solid #506EB5;
+    color: #506EB5;
+}
+
+.fa-bars{
+    color: #506EB5;
 }
 
 .dropdown-item{
@@ -112,7 +107,7 @@ hr {
 .main-form{
     border-radius: 50px;
     color: white;
-    background-color: #89A4E1;
+    background-color: rgba(137, 164, 225, 0.85);
     padding-bottom: 20px;
     margin-bottom: 15px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.3);
