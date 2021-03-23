@@ -12,8 +12,8 @@ class ActivityType(models.Model):
 
 
 class Activity(models.Model):
-    STATUS_DEFAULT = 'P'
-    STATUS_CHOICES = [(STATUS_DEFAULT, 'Pendiente'), ('C', 'Cancelada'), ('D', 'Finalizada')]
+    STATUS_PENDING = 'P'
+    STATUS_CHOICES = [(STATUS_PENDING, 'Pendiente'), ('C', 'Cancelada'), ('D', 'Finalizada')]
 
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=1000)
@@ -25,7 +25,7 @@ class Activity(models.Model):
     normal_price = models.FloatField()
     member_price = models.FloatField(null=True)
     number_participants = models.IntegerField()
-    status = models.CharField(choices=STATUS_CHOICES, max_length=1, default=STATUS_DEFAULT)
+    status = models.CharField(choices=STATUS_CHOICES, max_length=1, default=STATUS_PENDING)
     location = models.CharField(max_length=100)
     only_member = models.BooleanField(default=False)
 
