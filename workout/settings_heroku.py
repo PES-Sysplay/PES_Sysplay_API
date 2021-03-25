@@ -16,3 +16,14 @@ ALLOWED_HOSTS.append(DOMAIN)
 
 MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', None),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', None),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', None),
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# Sendgrid API key
+SENDGRID_API_KEY = os.environ.get('SG_KEY', None)
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"

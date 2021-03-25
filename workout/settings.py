@@ -36,7 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
     'bootstrap5',
     'rest_framework',
     'activity',
@@ -137,9 +139,6 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesSto
 
 MEDIA_ROOT = 'files'
 MEDIA_URL = '/files/'
-
-# Sendgrid API key
-SENDGRID_API_KEY = os.environ.get('SG_KEY', None)
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
