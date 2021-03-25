@@ -14,8 +14,8 @@ elif not DOMAIN:
     DOMAIN = 'localhost:8000'
 ALLOWED_HOSTS.append(DOMAIN)
 
-MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', None),
