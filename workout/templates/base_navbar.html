@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+{% block base_nav %}
+    <div class="container container-main">
+        <nav class="navbar navbar-expand-lg">
+          <div class="container-fluid">
+
+            <!-- Icon -->
+            <img src= "{% static 'favicon.png' %}" alt="WorkOut Logo" class="nav-logo">
+            <p class="navbar-name">WorkOut</p>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"><i class="fa fa-bars" aria-hidden="true"></i></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+              <ul class="nav navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Mis eventos</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link{% if 'activity/create' in request.build_absolute_uri %} active{% endif %}" href="{% url 'create_activity' %}">Nuevo evento</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Mi organización</a>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Mi cuenta
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <li><a class="dropdown-item" href="#">Conectado como @usuario</a></li>
+                    <div class="dropdown-divider"></div>
+                    <li><a class="dropdown-item" href="#">Perfil</a></li>
+                    <li><a class="dropdown-item" href="#">Valoraciones</a></li>
+                    <li><a class="dropdown-item" href="#">Ajustes</a></li>
+                    <div class="dropdown-divider"></div>
+                    <li><a class="dropdown-item" href="#">Cerrar sesión</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+        <div class="main-form">
+            {% block body %}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
