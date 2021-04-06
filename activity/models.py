@@ -1,6 +1,9 @@
 from datetime import datetime
 
 from django.db import models
+
+from user.models import Organization, Organizer
+
 from .validators import validate_file_extension
 
 
@@ -28,7 +31,19 @@ class Activity(models.Model):
     status = models.CharField(choices=STATUS_CHOICES, max_length=1, default=STATUS_PENDING)
     location = models.CharField(max_length=100)
     only_member = models.BooleanField(default=False)
+    organized_by = models.ForeignKey(Organization, on_delete=models.DO_NOTHING, null=False, default=1)
+    created_by = models.ForeignKey(Organizer, on_delete=models.DO_NOTHING, null=False, default=1)
 
     class Meta:
         verbose_name_plural = 'Activities'
-        unique_together = ('activity_type', 'start_date', 'start_time', 'location')
+        unique_together = ('activity_type', 'start_date', 'start_time', 'location', 'organized_by')
+        #unique_together = ('activity_type', 'start_date', 'start_time', 'location')
+
+
+class InstructedBy(models.Model):
+    organizer = models.ForeignKey(Organizer, on_delete=models.DO_NOTHING, null=False, default=1)
+    activity = models.ForeignKey(Activity, on_delete=models.DO_NOTHING, null=False, default=1)
+
+    class Meta:
+        unique_together = ('activity', 'organizer')
+
