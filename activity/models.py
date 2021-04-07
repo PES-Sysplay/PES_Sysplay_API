@@ -37,7 +37,7 @@ class Activity(models.Model):
     class Meta:
         verbose_name_plural = 'Activities'
         unique_together = ('activity_type', 'start_date', 'start_time', 'location', 'organized_by')
-        #unique_together = ('activity_type', 'start_date', 'start_time', 'location')
+        # unique_together = ('activity_type', 'start_date', 'start_time', 'location')
 
 
 class InstructedBy(models.Model):
@@ -46,4 +46,3 @@ class InstructedBy(models.Model):
 
     class Meta:
         unique_together = ('activity', 'organizer')
-
