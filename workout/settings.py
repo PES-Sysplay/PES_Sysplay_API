@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'activity',
     'api',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -142,8 +143,9 @@ MEDIA_URL = '/files/'
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
+
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.AllowAny'
     ]
 }
 
