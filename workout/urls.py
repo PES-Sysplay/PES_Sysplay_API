@@ -19,7 +19,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 from workout.views import home
-from rest_framework.authtoken import views
 
 
 urlpatterns = [
@@ -27,7 +26,6 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('activity/', include('activity.urls')),
     path('api/', include('api.urls')),
-    path('api_generate_token', views.obtain_auth_token),
     path('', home, name='home'),
 ]
 
