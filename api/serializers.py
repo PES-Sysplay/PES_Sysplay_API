@@ -31,29 +31,23 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
                   'normal_price', 'member_price', 'number_participants', 'status', 'location', 'only_member']
 
 
-class RegistrationSerializer(serializers.HyperlinkedModelSerializer):
-    username = serializers.CharField()
-    email = serializers.CharField()
-    password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
-    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+class RegistrationSerializer(serializers.ModelSerializer):
+    email = serializers.CharField(source='user.email')
+    username = serializers.CharField(source='user.username')
+    password = serializers.CharField(source='user.password', style={'input_type': 'password'}, write_only=True)
 
     class Meta:
         model = Client
-        fields = ['username', 'email', 'password', 'password2']
+        fields = ['username', 'email', 'password']
 
     def save(self):
         user = User(
-            email=self.validated_data['email'],
-            username=self.validated_data['username'],
+            email=self.validated_data['user']['email'],
+            username=self.validated_data['user']['username'],
         )
 
-        password = self.validated_data['password']
-        password2 = self.validated_data['password2']
-
-        if password != password2:
-            raise serializers.ValidationError({'password': 'Las contraseñas no coinciden.'})
-        user.password = password
-
+        password = self.validated_data['user']['password']
+        user.set_password(password)
         client = Client(
             user=user
         )
