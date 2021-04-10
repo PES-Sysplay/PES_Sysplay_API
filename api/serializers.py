@@ -54,3 +54,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user.save()
         client.save()
         return client
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User
+    email = serializers.CharField(required=True)
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
