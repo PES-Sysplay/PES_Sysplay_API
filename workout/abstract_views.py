@@ -26,11 +26,15 @@ class FormView(ABC, TemplateView):
         context.update({'form': form})
         return context
 
+    def save_model(self, model_object):
+        model_object.save()
+
     def post(self, request, *args, **kwargs):
         model_object = self.get_model_object()
         form = self.form_class(request.POST, request.FILES, instance=model_object)
         if form.is_valid():
-            model_object = form.save()
+            model_object = form.save(commit=False)
+            self.save_model(model_object)
             return self.get_success_redirect(model_object=model_object)
         context = self.get_context_data(model_object=model_object)
         context.update({'form': form})
