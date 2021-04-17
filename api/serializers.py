@@ -28,7 +28,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Activity
         fields = ['id', 'name', 'description', 'photo_url', 'activity_type_id', 'date_time', 'duration',
-                  'normal_price', 'member_price', 'number_participants', 'status', 'location', 'only_member']
+                  'normal_price', 'member_price', 'number_participants', 'status', 'location', 'only_member', 'organized_by', 'created_by']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

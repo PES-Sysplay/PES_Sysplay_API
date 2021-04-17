@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'cloudinary',
     'bootstrap5',
     'rest_framework',
+    'rest_framework.authtoken',
     'activity',
     'api',
     'user',
@@ -145,8 +146,11 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
 
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny'
-    ]
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }
 
 MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')

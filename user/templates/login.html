@@ -1,0 +1,20 @@
+{% extends 'base_navbar.html' %}
+{% load bootstrap5 %}
+{% block content %}
+    <div class="row justify-content-md-center">
+        <div class="col-4">
+            <div class="main-form">
+                <form style="margin-left: 20px; margin-right: 20px" method="post">
+                    {% csrf_token %}
+                    <h1 style="text-align: center">Accede a WorkOut</h1>
+                    {% for error in form.non_field_errors %}
+                        <div class="alert alert-danger">{{ error|escape }}</div>
+                    {% endfor %}
+                    {% bootstrap_field form.username %}
+                    {% bootstrap_field form.password %}
+                    <button type="submit" class="button btn btn-block btn-success">Entra</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

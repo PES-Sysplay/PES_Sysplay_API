@@ -4,26 +4,26 @@ from django.views.generic import TemplateView
 
 from activity.form import ActivityForm
 from activity.models import Activity
+from user.mixins import OrganizerPermission, OrganizerActivityPermission
+from user.models import Organizer
 from workout.abstract_views import FormView
 
 
-class CreateActivityView(TemplateView):
-    template_name = 'create_activity.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
-
-class ActivityCreate(FormView):
+class ActivityCreate(OrganizerPermission, FormView):
     template_name = 'create_activity.html'
     form_class = ActivityForm
+
+    def save_model(self, model_object):
+        organizer = Organizer.objects.get(user=self.request.user)
+        model_object.created_by = organizer
+        model_object.organized_by = organizer.organization
+        model_object.save()
 
     def get_success_redirect(self, model_object):
         return redirect(reverse('view_activity', args=[model_object.pk]))
 
 
-class ActivityView(ActivityCreate):
+class ActivityView(OrganizerActivityPermission, ActivityCreate):
     template_name = 'create_activity.html'
     form_class = ActivityForm
 
@@ -36,7 +36,7 @@ class ActivityView(ActivityCreate):
         return activity
 
 
-class ActivityEdit(ActivityCreate):
+class ActivityEdit(OrganizerActivityPermission, ActivityCreate):
 
     def get_model_object(self, *args, **kwargs):
         m_id = self.kwargs.get('id')
@@ -44,3 +44,14 @@ class ActivityEdit(ActivityCreate):
         # if activity.org != self.request.user.org:
         #     raise PermissionDenied()
         return activity
+
+
+class ActivityListView(OrganizerPermission, TemplateView):
+    template_name = 'my_activities.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        organizer = get_object_or_404(Organizer, user=self.request.user)
+        activities = Activity.objects.filter(organized_by=organizer.organization).order_by('start_date')
+        context.update({'activities': activities})
+        return context

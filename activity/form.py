@@ -28,8 +28,9 @@ class ActivityForm(BootstrapFormMixin, forms.ModelForm):
         fields = get_fields(bootstrap_field_info)
         labels = {
             'name': 'Nombre de la actividad',
+            'activity_type': 'Tipo de actividad',
             'description': 'Descripción',
-            'photo': 'Adjuntar foto de actividad',
+            'photo': 'Imagen',
             'start_date': 'Fecha de inicio',
             'start_time': 'Hora de inicio',
             'duration': 'Duración de la actividad',
