@@ -20,6 +20,7 @@ from django.urls import path, include
 
 from workout.views import home
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
