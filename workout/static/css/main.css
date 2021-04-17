@@ -118,6 +118,18 @@ ul {
     padding-top: 10px;
     text-align: center;
 }
+.mb-3 a{
+    color: white;
+}
+
+.mb-3 a:hover{
+    color: lightgray;
+}
+
+.edit-btn{
+    margin-left: 42%;
+    margin-right: 42%;
+}
 
 ::placeholder{
     color: gray!important;
@@ -126,3 +138,109 @@ ul {
 .margin-top {
     margin-top: 15px;
 }
+
+/*login*/
+
+    .login-form, .signup-form {
+		width: 340px;
+        height: 150px;
+		margin: 30px auto;
+        color: white;
+        font-family: "Oswald", sans-serif;
+	}
+
+    .login-form form, .signup-form form {
+        border-radius: 50px;
+    	margin-bottom: 15px;
+        background: rgba(128, 148, 194, 0.85);
+        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+    }
+
+    .login-form h2, .signup-form h2 {
+        margin: 0 0 15px;
+        font-weight: normal;
+        padding-bottom: 10px;
+        text-align: center;
+    }
+
+    .login-form a, .signup-form a{
+        color: #506EB5;
+    }
+
+    .form-control, .btn {
+        min-height: 38px;
+        border-radius: 2px;
+    }
+	.input-group-addon .fa {
+        font-size: 18px;
+    }
+
+    .clearfix{
+        padding-bottom: 10px;
+    }
+
+    .logo-login{
+        width: 100px;
+        display:block;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .no-account{
+        padding-top: 20px;
+    }
+
+    .enter{
+        padding-right: 5%;
+        padding-left: 5%;
+        margin-top: 20px!important;
+        font-weight: normal!important;
+        color: white!important;
+        border: none!important;
+        background-color: #8094C2!important;
+        margin: auto;
+       display: block;
+    }
+
+    .enter:hover{
+        background-color:  #506EB5!important;
+        color: white!important;
+        border: 1px solid #506EB5!important;
+    }
+
+    /*register*/
+
+    .form-control{
+		height: 40px;
+		box-shadow: none;
+        font-family: "Oswald", sans-serif;
+	}
+
+	.signup-form .form-group{
+		margin-bottom: 20px;
+	}
+	.signup-form input[type="checkbox"]{
+		margin-top: 3px;
+	}
+
+    .signup-form a{
+		color: #fff;
+		text-decoration: underline;
+	}
+    .signup-form a:hover{
+		text-decoration: none;
+	}
+	.signup-form form a{
+		color: #506EB5;
+		text-decoration: none;
+	}
+	.signup-form form a:hover{
+		text-decoration: underline;
+	}
+
+
+
+
