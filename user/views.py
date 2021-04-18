@@ -1,10 +1,14 @@
 from django.contrib.auth import authenticate, login as djangologin, logout as djangologout
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
+from django.views.generic import TemplateView
+from django_tables2 import SingleTableView
 
 from user.forms import LoginForm
+from user.mixins import OrganizerAdminPermission
 from user.models import Organizer
+from user.tables import OrganizerTable
 
 
 def login(request):
@@ -36,3 +40,13 @@ def login(request):
 def logout(request):
     djangologout(request)
     return HttpResponseRedirect(reverse('login'))
+
+
+class OrganizerListView(OrganizerAdminPermission, SingleTableView):
+    template_name = 'organizer_list.html'
+    table_class = OrganizerTable
+    model = Organizer
+
+    def get_queryset(self):
+        organizer_admin = get_object_or_404(Organizer, user=self.request.user)
+        return Organizer.objects.filter(organization=organizer_admin.organization)

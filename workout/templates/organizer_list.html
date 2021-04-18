@@ -1,0 +1,10 @@
+{% extends 'base_navbar.html' %}
+{% load render_table from django_tables2 %}
+{% block content %}
+    <div class="row justify-content-md-center main-form">
+        <div class="col-11">
+            <h2 style="text-align: center">Mis organizadores</h2>
+            {% render_table table 'django_tables2/bootstrap-responsive.html' %}
+        </div>
+    </div>
+{% endblock %}
