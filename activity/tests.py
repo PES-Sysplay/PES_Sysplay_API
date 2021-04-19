@@ -13,7 +13,7 @@ class ActivityTestCase(TestCase):
                                 description='Classe dels dimecres de yoga....', activity_type_id=activity_type,
                                 duration=60.0, normal_price=0, number_participants=10, location='41.394082, 2.140952')
 
-    def test_animals_can_speak(self):
+    def test_activity_simple(self):
         yoga_type = ActivityType.objects.get(name='Yoga')
         yoga_class = Activity.objects.get(activity_type=yoga_type, start_time=self.now.time(),
                                           start_date=self.now.date(), location='41.394082, 2.140952')

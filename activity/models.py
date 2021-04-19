@@ -31,8 +31,8 @@ class Activity(models.Model):
     status = models.CharField(choices=STATUS_CHOICES, max_length=1, default=STATUS_PENDING)
     location = models.CharField(max_length=100)
     only_member = models.BooleanField(default=False)
-    organized_by = models.ForeignKey(Organization, on_delete=models.DO_NOTHING, null=False, default=1)
-    created_by = models.ForeignKey(Organizer, on_delete=models.DO_NOTHING, null=False, default=1)
+    organized_by = models.ForeignKey(Organization, on_delete=models.DO_NOTHING, null=True)
+    created_by = models.ForeignKey(Organizer, on_delete=models.DO_NOTHING, null=True)
 
     class Meta:
         verbose_name_plural = 'Activities'
