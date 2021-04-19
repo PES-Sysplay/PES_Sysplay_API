@@ -1,10 +1,10 @@
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework.response import Response
-from rest_framework import status
+from django.shortcuts import get_object_or_404
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.mixins import CreateModelMixin
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import UpdateAPIView
-from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from activity.models import Activity
 from user.models import Client
@@ -16,37 +16,22 @@ from api.serializers import RegistrationSerializer
 class ActivityViewSet(ReadOnlyModelViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = [IsAuthenticated]
 
 
-class ClientViewSet(ModelViewSet):
+class ClientViewSet(CreateModelMixin, GenericViewSet):
     queryset = Client.objects.all()
     serializer_class = RegistrationSerializer
 
 
 class ChangePasswordView(UpdateAPIView):
     serializer_class = ChangePasswordSerializer
+    queryset = User.objects.all()
     model = User
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = [IsAuthenticated]
 
-    def update(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            email = serializer.data.get("email")
-            try:
-                client = User.objects.get(email=email)
-            except ObjectDoesNotExist:
-                return Response({"email": ["El usuario no existe"]})
-
-            if not client.check_password(serializer.data.get("old_password")):
-                return Response({"old_password": ["Contraseña antigua incorrecta"]}, status=status.HTTP_400_BAD_REQUEST)
-            client.set_password(serializer.data.get("new_password"))
-            client.save()
-            response = {
-                'status': 'success',
-                'code': status.HTTP_200_OK,
-                'message': 'Contraseña guardada correctamente, nueva contraseña: ' + client.password,
-                'data': []
-            }
-
-            return Response(response)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_object(self):
+        client = get_object_or_404(Client, user=self.request.user)
+        return client.user

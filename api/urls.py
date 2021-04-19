@@ -10,6 +10,6 @@ router.register(r'client', ClientViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('change-password/', ChangePasswordView.as_view(), name='change-password'),
-    path('login', views.obtain_auth_token),
+    path('change_password/', ChangePasswordView.as_view(), name='change-password'),
+    path('login/', views.obtain_auth_token),
 ]
