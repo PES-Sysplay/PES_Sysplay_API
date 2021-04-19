@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from activity.models import Activity
-from user.models import Organizer, Client
+from user.models import Organizer
 
 
 class OrganizerPermission(PermissionRequiredMixin):

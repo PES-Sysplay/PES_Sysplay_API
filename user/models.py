@@ -15,7 +15,7 @@ class Organizer(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     admin = models.BooleanField()
     organization = models.ForeignKey(Organization, on_delete=models.DO_NOTHING, null=False)
-    
+
 
 class Client(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)

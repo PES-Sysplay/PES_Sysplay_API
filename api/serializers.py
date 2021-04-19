@@ -84,5 +84,3 @@ class ChangePasswordSerializer(serializers.Serializer):
             return instance
         else:
             raise serializers.ValidationError("Password error")
-
-
