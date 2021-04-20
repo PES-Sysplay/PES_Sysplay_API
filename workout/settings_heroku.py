@@ -22,4 +22,4 @@ EMAIL_HOST_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', '')
 EMAIL_USE_TLS = True
 
 ADMINS = [('Arnau', 'arnau.casas@estudiantat.upc.edu')]
-ADMINS_EMAIL = 'Workout <arnau.casas@estudiantat.upc.edu>'
+ADMINS_EMAIL = 'Workout <%s>' % os.environ.get('MAILGUN_MAIL', '')
