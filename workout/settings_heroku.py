@@ -20,3 +20,4 @@ SENDGRID_API_KEY = os.environ.get('SENDGRID_API', None)
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 
 ADMINS = [('Arnau', 'arnau.casas@estudiantat.upc.edu')]
+ADMINS_EMAIL = 'Workout <arnau.casas@estudiantat.upc.edu>'
