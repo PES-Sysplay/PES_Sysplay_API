@@ -16,7 +16,7 @@
                         <p>Bienvenido {{ invited.user.first_name }}!</p>
                         <p>Has sido invitado a la organizacion {{ invited.organization.name }} por {{ sender.first_name }}</p>
                         <p>Puedes entrar en la web cuando quieras con esta contraseña: {{ password }}</p>
-                        <p>Recomendamos que entres y canvies la contraseña.</p>
+                        <p>Recomendamos que entres y cambies la contraseña.</p>
                         {% include 'mails/include/button.html' with url=login_url text='Log in' %}
                     {% endblock %}
                 </td>

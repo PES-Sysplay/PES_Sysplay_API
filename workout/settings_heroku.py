@@ -24,4 +24,4 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 ADMINS = [('Arnau', 'arnau.casas@estudiantat.upc.edu')]
-ADMINS_EMAIL = 'Workout <%s>' % os.environ.get('MAILGUN_MAIL', '')
+ADMIN_EMAIL = 'Workout <%s>' % 'arnau.casas@estudiantat.upc.edu'
