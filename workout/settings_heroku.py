@@ -15,9 +15,11 @@ CLOUDINARY_STORAGE = {
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# Sendgrid API key
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API', None)
-EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+EMAIL_HOST = os.environ.get('MAILGUN_SMTP_SERVER', '')
+EMAIL_PORT = os.environ.get('MAILGUN_SMTP_PORT', '')
+EMAIL_HOST_USER = os.environ.get('MAILGUN_SMTP_LOGIN', '')
+EMAIL_HOST_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', '')
+EMAIL_USE_TLS = True
 
 ADMINS = [('Arnau', 'arnau.casas@estudiantat.upc.edu')]
 ADMINS_EMAIL = 'Workout <arnau.casas@estudiantat.upc.edu>'
