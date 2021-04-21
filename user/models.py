@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 from django.contrib.auth.models import User
@@ -19,3 +21,5 @@ class Organizer(models.Model):
 
 class Client(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
+    is_verified = models.BooleanField(default=False)
+    token_verification = models.UUIDField(unique=True, default=uuid.uuid4)
