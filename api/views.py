@@ -9,6 +9,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from activity.models import Activity
 from api.emails import send_email_verification
+from user.mixins import ClientPermission
 from user.models import Client
 
 from api.serializers import ActivitySerializer, ChangePasswordSerializer
@@ -19,7 +20,7 @@ class ActivityViewSet(ReadOnlyModelViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
     authentication_classes = (TokenAuthentication, )
-    permission_classes = [IsAuthenticated]
+    permission_classes = [ClientPermission]
 
 
 class ClientViewSet(CreateModelMixin, GenericViewSet):
@@ -38,7 +39,7 @@ class ChangePasswordView(UpdateAPIView):
     queryset = User.objects.all()
     model = User
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticated]
+    permission_classes = [ClientPermission]
 
     def get_object(self):
         client = get_object_or_404(Client, user=self.request.user)
