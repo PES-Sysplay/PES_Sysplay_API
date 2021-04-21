@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login as djangologin, logout as djangologout
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.views import View
@@ -11,7 +11,7 @@ from django_tables2 import SingleTableView
 from user.emails import send_email_invitation
 from user.forms import LoginForm, RegisterForm
 from user.mixins import OrganizerAdminPermission
-from user.models import Organizer
+from user.models import Organizer, Client
 from user.tables import OrganizerTable
 
 
@@ -91,3 +91,14 @@ class DeleteUserView(OrganizerAdminPermission, View):
             User.objects.get(pk=id).delete()
             return redirect(reverse('manage'))
         raise PermissionDenied()
+
+
+def verification_email(request, id, token):
+    client = get_object_or_404(Client, user_id=id)
+    if client.is_verified:
+        raise Http404()
+    if token != client.token_verification:
+        raise Http404()
+    client.is_verified = True
+    client.save()
+    return render(request, template_name='verify_user.html', context={})

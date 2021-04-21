@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from rest_framework.permissions import IsAuthenticated
 
 from activity.models import Activity
 from user.models import Organizer
@@ -33,3 +34,8 @@ class OrganizerActivityPermission(OrganizerPermission):
         activity_id = self.kwargs.get("id", '')
         activity = get_object_or_404(Activity, pk=activity_id)
         return activity.organized_by_id == organizer.organization_id
+
+
+class ClientPermission(IsAuthenticated):
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) and request.user.client.is_verified

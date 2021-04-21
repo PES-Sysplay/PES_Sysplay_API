@@ -48,7 +48,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     token = serializers.SerializerMethodField()
 
     def get_token(self, client):
-        token = Token.objects.get(user__email=client.get('user').get('email')).key
+        token = Token.objects.get(user__username=client.get('user').get('username')).key
         return token
 
     class Meta:

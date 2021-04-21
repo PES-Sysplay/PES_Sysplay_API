@@ -1,0 +1,14 @@
+{% extends 'base_navbar.html' %}
+{% load bootstrap5 %}
+{% load static %}
+{% block content %}
+    <div class="row justify-content-md-center">
+        <div class="col-4">
+            <div class="main-form">
+                <img src="{% static 'favicon.png' %}" alt="WorkOut Logo" class="logo-login">
+                <h2 class="text-center">Verificación del correo</h2>
+                <p style="text-align: center">El correo ha sido verificado correcatamente.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
