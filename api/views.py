@@ -3,7 +3,6 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.mixins import CreateModelMixin
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import UpdateAPIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
