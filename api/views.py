@@ -6,12 +6,12 @@ from rest_framework.mixins import CreateModelMixin
 from rest_framework.generics import UpdateAPIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
-from activity.models import Activity
+from activity.models import Activity, ActivityType
 from api.emails import send_email_verification
 from user.mixins import ClientPermission
 from user.models import Client
 
-from api.serializers import ActivitySerializer, ChangePasswordSerializer
+from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer
 from api.serializers import RegistrationSerializer
 
 
@@ -43,3 +43,8 @@ class ChangePasswordView(UpdateAPIView):
     def get_object(self):
         client = get_object_or_404(Client, user=self.request.user)
         return client.user
+
+
+class ActivityTypeViewSet(ReadOnlyModelViewSet):
+    serializer_class = ActivityTypeSerializer
+    queryset = ActivityType.objects.all()

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
-from activity.models import Activity
+from activity.models import Activity, ActivityType
 
 from user.models import Client
 
@@ -84,3 +84,14 @@ class ChangePasswordSerializer(serializers.Serializer):
             return instance
         else:
             raise serializers.ValidationError("Password error")
+
+
+class ActivityTypeSerializer(serializers.Serializer):
+    name = serializers.CharField()
+
+    def get_activity_types(self):
+        return ActivityType.objects.all()
+
+    class Meta:
+        model = ActivityType
+        fields = ['name']

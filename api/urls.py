@@ -1,12 +1,13 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from api.views import ActivityViewSet, ClientViewSet, ChangePasswordView
+from api.views import ActivityViewSet, ClientViewSet, ChangePasswordView, ActivityTypeViewSet
 from rest_framework.authtoken import views
 
 router = routers.DefaultRouter()
 router.register(r'activity', ActivityViewSet)
 router.register(r'client', ClientViewSet)
+router.register(r'activitytype', ActivityTypeViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
