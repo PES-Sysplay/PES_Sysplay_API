@@ -15,9 +15,35 @@ CLOUDINARY_STORAGE = {
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# Sendgrid API key
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API', None)
-EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', '')
 
-ADMINS = [('Arnau', 'arnau.casas@estudiantat.upc.edu')]
-ADMINS_EMAIL = 'Workout <arnau.casas@estudiantat.upc.edu>'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+ADMINS = [('Admin', 'noreply.workout@gmail.com')]
+ADMIN_EMAIL = 'Workout <%s>' % 'noreply.workout@gmail.com'
+
+LOGGING = {
+    'version': 1,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+    'handlers': {
+        'admin_email': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'workout.log.WorkoutDevEmailHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'level': 'ERROR',
+            'handlers': ['admin_email'],
+        },
+    },
+}
