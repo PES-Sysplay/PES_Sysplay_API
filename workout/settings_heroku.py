@@ -23,5 +23,27 @@ EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-ADMINS = [('Arnau', 'arnau.casas@estudiantat.upc.edu')]
-ADMIN_EMAIL = 'Workout <%s>' % 'arnau.casas@estudiantat.upc.edu'
+ADMINS = [('Admin', 'noreply.workout@gmail.com')]
+ADMIN_EMAIL = 'Workout <%s>' % 'noreply.workout@gmail.com'
+
+LOGGING = {
+    'version': 1,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+    'handlers': {
+        'admin_email': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'workout.log.WorkoutDevEmailHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'level': 'ERROR',
+            'handlers': ['admin_email'],
+        },
+    },
+}
