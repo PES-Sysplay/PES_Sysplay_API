@@ -89,9 +89,6 @@ class ChangePasswordSerializer(serializers.Serializer):
 class ActivityTypeSerializer(serializers.Serializer):
     name = serializers.CharField()
 
-    def get_activity_types(self):
-        return ActivityType.objects.all()
-
     class Meta:
         model = ActivityType
         fields = ['name']
