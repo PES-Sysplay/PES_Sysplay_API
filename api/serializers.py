@@ -92,3 +92,7 @@ class ActivityTypeSerializer(serializers.Serializer):
     class Meta:
         model = ActivityType
         fields = ['name']
+
+
+class DeleteSerializer(serializers.Serializer):
+    model = Client

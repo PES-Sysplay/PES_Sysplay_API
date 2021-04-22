@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.mixins import CreateModelMixin
-from rest_framework.generics import UpdateAPIView
+from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from activity.models import Activity, ActivityType
@@ -11,14 +11,14 @@ from api.emails import send_email_verification
 from user.mixins import ClientPermission
 from user.models import Client
 
-from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer
+from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, DeleteSerializer
 from api.serializers import RegistrationSerializer
 
 
 class ActivityViewSet(ReadOnlyModelViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
-    authentication_classes = (TokenAuthentication, )
+    authentication_classes = (TokenAuthentication,)
     permission_classes = [ClientPermission]
 
 
@@ -48,3 +48,15 @@ class ChangePasswordView(UpdateAPIView):
 class ActivityTypeViewSet(ReadOnlyModelViewSet):
     serializer_class = ActivityTypeSerializer
     queryset = ActivityType.objects.all()
+
+
+class ClientDeleteView(RetrieveDestroyAPIView):
+    queryset = Client.objects.all()
+    serializer_class = DeleteSerializer
+    model = Client
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = [ClientPermission]
+
+    def get_object(self):
+        client = get_object_or_404(Client, user=self.request.user)
+        return client.user
