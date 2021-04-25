@@ -37,12 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django_tables2",
     'cloudinary_storage',
     'cloudinary',
     'bootstrap5',
     'rest_framework',
+    'rest_framework.authtoken',
     'activity',
     'api',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -140,11 +143,6 @@ MEDIA_ROOT = 'files'
 MEDIA_URL = '/files/'
 
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
 }
 
 MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')

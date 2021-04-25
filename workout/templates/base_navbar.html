@@ -6,44 +6,55 @@
           <div class="container-fluid">
 
             <!-- Icon -->
-            <img src= "{% static 'favicon.png' %}" alt="WorkOut Logo" class="nav-logo">
-            <p class="navbar-name">WorkOut</p>
-
+            <a href="{% url 'home' %}">
+                <div style="float: left; background-image: url('{% static 'favicon.png' %}'); height: 50px; width: 50px; background-size: 100% auto;"></div>
+                <div style="float: right">
+                    <p class="navbar-name">WorkOut</p>
+                </div>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"><i class="fa fa-bars" aria-hidden="true"></i></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
-              <ul class="nav navbar-nav">
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Mis eventos</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link{% if 'activity/create' in request.build_absolute_uri %} active{% endif %}" href="{% url 'create_activity' %}">Nuevo evento</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Mi organización</a>
-                </li>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Mi cuenta
-                  </a>
-                  <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><a class="dropdown-item" href="#">Conectado como @usuario</a></li>
-                    <div class="dropdown-divider"></div>
-                    <li><a class="dropdown-item" href="#">Perfil</a></li>
-                    <li><a class="dropdown-item" href="#">Valoraciones</a></li>
-                    <li><a class="dropdown-item" href="#">Ajustes</a></li>
-                    <div class="dropdown-divider"></div>
-                    <li><a class="dropdown-item" href="#">Cerrar sesión</a></li>
-                  </ul>
-                </li>
+              <ul class="nav navbar-nav ms-auto">
+                {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                      <a class="nav-link{% if 'activity/all' in request.build_absolute_uri %} active{% endif %}" href="{% url 'activity_list_view' %}">Mis eventos</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link{% if 'activity/create' in request.build_absolute_uri %} active{% endif %}" href="{% url 'create_activity' %}">Nuevo evento</a>
+                    </li>
+                    {% if request.user.organizer.admin %}
+                        <li class="nav-item">
+                          <a class="nav-link{% if 'user/manage' in request.build_absolute_uri %} active{% endif %}" href="{% url 'manage' %}">Mi organización</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          {{  request.user.username }}
+                      </a>
+                      <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+{#                        <li><a class="dropdown-item" href="#">Perfil</a></li>#}
+{#                        <li><a class="dropdown-item" href="#">Valoraciones</a></li>#}
+{#                        <li><a class="dropdown-item" href="#">Ajustes</a></li>#}
+{#                        <div class="dropdown-divider"></div>#}
+                        <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a></li>
+                      </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                      <a class="nav-link{% if 'user/login' in request.build_absolute_uri %} active{% endif %}" href="{% url 'login' %}">Log in</a>
+                    </li>
+                {% endif %}
               </ul>
             </div>
           </div>
         </nav>
-        <div class="main-form">
-            {% block body %}
-            {% endblock %}
-        </div>
+        {% block content %}
+            <div class="main-form">
+                {% block body %}
+                {% endblock %}
+            </div>
+        {% endblock %}
     </div>
 {% endblock %}
