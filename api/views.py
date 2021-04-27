@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.mixins import CreateModelMixin
@@ -44,7 +43,7 @@ class ChangePasswordView(UpdateAPIView):
     def get_object(self):
         try:
             return Client.objects.get(user=self.request.user).user
-        except:
+        except Client.DoesNotExist:
             raise PermissionDenied()
 
 
@@ -65,5 +64,5 @@ class UserClientView(RetrieveDestroyAPIView):
     def get_object(self):
         try:
             return Client.objects.get(user=self.request.user).user
-        except:
+        except Client.DoesNotExist:
             raise PermissionDenied()
