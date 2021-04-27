@@ -51,10 +51,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         token = Token.objects.get(user__username=client.get('user').get('username')).key
         return token
 
-    class Meta:
-        model = Client
-        fields = ['username', 'email', 'password', 'token']
-
     def save(self):
         user = User(
             email=self.validated_data['user']['email'],
@@ -70,6 +66,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
         client.save()
         Token(user=user).save()
         return client
+
+    class Meta:
+        model = Client
+        fields = ['username', 'email', 'password', 'token']
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -94,5 +94,10 @@ class ActivityTypeSerializer(serializers.Serializer):
         fields = ['name']
 
 
-class DeleteSerializer(serializers.Serializer):
-    model = Client
+class UserSerializer(serializers.Serializer):
+    email = serializers.CharField()
+    username = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ['email', 'username']

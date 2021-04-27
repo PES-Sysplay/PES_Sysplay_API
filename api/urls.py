@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from api.views import ActivityViewSet, ClientViewSet, ChangePasswordView, ActivityTypeViewSet, ClientDeleteView
+from api.views import ActivityViewSet, ClientViewSet, ChangePasswordView, ActivityTypeViewSet, UserClientView
 from rest_framework.authtoken import views
 
 router = routers.DefaultRouter()
@@ -12,6 +12,6 @@ router.register(r'activitytype', ActivityTypeViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('change_password/', ChangePasswordView.as_view(), name='change-password'),
-    path('delete_client/', ClientDeleteView.as_view(), name='delete-client'),
+    path('me/', UserClientView.as_view(), name='client'),
     path('login/', views.obtain_auth_token),
 ]
