@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework.authentication import TokenAuthentication
@@ -11,7 +12,7 @@ from api.emails import send_email_verification
 from user.mixins import ClientPermission
 from user.models import Client
 
-from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, DeleteSerializer
+from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, UserSerializer
 from api.serializers import RegistrationSerializer
 
 
@@ -41,22 +42,28 @@ class ChangePasswordView(UpdateAPIView):
     permission_classes = [ClientPermission]
 
     def get_object(self):
-        client = get_object_or_404(Client, user=self.request.user)
-        return client.user
+        try:
+            return Client.objects.get(user=self.request.user).user
+        except:
+            raise PermissionDenied()
 
 
 class ActivityTypeViewSet(ReadOnlyModelViewSet):
     serializer_class = ActivityTypeSerializer
     queryset = ActivityType.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = [ClientPermission]
 
 
-class ClientDeleteView(RetrieveDestroyAPIView):
+class UserClientView(RetrieveDestroyAPIView):
     queryset = Client.objects.all()
-    serializer_class = DeleteSerializer
-    model = Client
+    serializer_class = UserSerializer
+    model = User
     authentication_classes = (TokenAuthentication,)
     permission_classes = [ClientPermission]
 
     def get_object(self):
-        client = get_object_or_404(Client, user=self.request.user)
-        return client.user
+        try:
+            return Client.objects.get(user=self.request.user).user
+        except:
+            raise PermissionDenied()
