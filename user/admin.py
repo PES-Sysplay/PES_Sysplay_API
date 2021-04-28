@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Organization, Organizer, Client
+from .models import Organization, Organizer, Client, Favorites
 
 
 @admin.register(Organization)
@@ -14,4 +14,9 @@ class OrganizerAdmin(admin.ModelAdmin):
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Favorites)
+class FavoritesAdmin(admin.ModelAdmin):
     pass

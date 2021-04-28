@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.db import models
 
-from user.models import Organization, Organizer
+from user.models import Organization, Organizer, Client
 
 from .validators import validate_file_extension
 
@@ -45,3 +45,15 @@ class InstructedBy(models.Model):
 
     class Meta:
         unique_together = ('activity', 'organizer')
+
+
+class Joined(models.Model):
+    activity = models.ForeignKey(Activity, on_delete=models.DO_NOTHING, null=False, default=1)
+    client = models.ForeignKey(Client, on_delete=models.DO_NOTHING, null=False, default=1)
+    start_date = models.DateField(default=datetime.now)
+    start_time = models.TimeField(default=datetime.now)
+    # review = models.OneToOneField(Review, on_delete=models.DO_NOTHING)
+    # reported = models.OneToOneField(Reported, on_delete=models.DO_NOTHING)
+
+    class Meta:
+        unique_together = ('activity', 'client')

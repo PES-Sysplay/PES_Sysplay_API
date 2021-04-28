@@ -23,3 +23,11 @@ class Client(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     is_verified = models.BooleanField(default=False)
     token_verification = models.UUIDField(unique=True, default=uuid.uuid4)
+
+
+class Favorites(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.DO_NOTHING, null=False, default=1)
+    organization = models.ForeignKey(Organization, on_delete=models.DO_NOTHING, null=False, default=1)
+
+    class Meta:
+        unique_together = ('client', 'organization')
