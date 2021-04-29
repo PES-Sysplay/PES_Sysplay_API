@@ -13,6 +13,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     photo_url = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     date_time = serializers.SerializerMethodField()
+    timestamp = serializers.SerializerMethodField()
     organization = serializers.SerializerMethodField()
     created = serializers.SerializerMethodField()
 
@@ -34,11 +35,15 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     def get_created(self, activity):
         return activity.created_by.user.first_name
 
+    def get_timestamp(self, activity):
+        date_time = datetime.combine(activity.start_date, activity.start_time)
+        return date_time.timestamp()
+
     class Meta:
         model = Activity
         fields = ['id', 'name', 'description', 'photo_url', 'activity_type_id', 'date_time', 'duration',
                   'normal_price', 'member_price', 'number_participants', 'status', 'location', 'only_member',
-                  'organization', 'created']
+                  'organization', 'created', 'timestamp']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

@@ -200,6 +200,10 @@ th > a:hover, td > a:hover {
     margin-right: auto;
 }
 
+.pointer {
+    cursor: pointer;
+}
+
 .no-account{
     padding-top: 20px;
 }
