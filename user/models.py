@@ -16,7 +16,7 @@ class Organization(models.Model):
 class Organizer(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     admin = models.BooleanField()
-    organization = models.ForeignKey(Organization, on_delete=models.DO_NOTHING, null=False)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=False)
 
 
 class Client(models.Model):
@@ -26,8 +26,8 @@ class Client(models.Model):
 
 
 class Favorites(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.DO_NOTHING, null=False, default=1)
-    organization = models.ForeignKey(Organization, on_delete=models.DO_NOTHING, null=False, default=1)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, null=False, default=1)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=False, default=1)
 
     class Meta:
         unique_together = ('client', 'organization')

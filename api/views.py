@@ -1,9 +1,9 @@
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.mixins import CreateModelMixin
-from rest_framework.generics import UpdateAPIView
+from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from activity.models import Activity, ActivityType
@@ -11,14 +11,14 @@ from api.emails import send_email_verification
 from user.mixins import ClientPermission
 from user.models import Client
 
-from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer
+from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, UserSerializer
 from api.serializers import RegistrationSerializer
 
 
 class ActivityViewSet(ReadOnlyModelViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
-    authentication_classes = (TokenAuthentication, )
+    authentication_classes = (TokenAuthentication,)
     permission_classes = [ClientPermission]
 
 
@@ -41,10 +41,28 @@ class ChangePasswordView(UpdateAPIView):
     permission_classes = [ClientPermission]
 
     def get_object(self):
-        client = get_object_or_404(Client, user=self.request.user)
-        return client.user
+        try:
+            return Client.objects.get(user=self.request.user).user
+        except Client.DoesNotExist:
+            raise PermissionDenied()
 
 
 class ActivityTypeViewSet(ReadOnlyModelViewSet):
     serializer_class = ActivityTypeSerializer
     queryset = ActivityType.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = [ClientPermission]
+
+
+class UserClientView(RetrieveDestroyAPIView):
+    queryset = Client.objects.all()
+    serializer_class = UserSerializer
+    model = User
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = [ClientPermission]
+
+    def get_object(self):
+        try:
+            return Client.objects.get(user=self.request.user).user
+        except Client.DoesNotExist:
+            raise PermissionDenied()
