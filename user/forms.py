@@ -64,4 +64,3 @@ class ChangePasswordForm(forms.Form):
             self.add_error('password_new2', '')
             self.add_error(None, 'Las contraseñas no coinciden.')
         return cleaned_data
-

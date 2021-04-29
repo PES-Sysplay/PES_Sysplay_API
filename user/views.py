@@ -152,4 +152,3 @@ class ChangePassword(OrganizerPermission, TemplateView):
         context = self.get_context_data()
         context.update({'form': form})
         return render(request, self.template_name, context)
-
