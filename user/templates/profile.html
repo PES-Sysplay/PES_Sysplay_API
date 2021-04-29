@@ -1,0 +1,73 @@
+{% extends 'base_navbar.html' %}
+{% load bootstrap5 %}
+{% load static %}
+{% block content %}
+    <div class="row justify-content-md-center">
+        <div class="col-5">
+            <div class="main-form">
+                <h2 class="text-center">Perfil</h2>
+                {% if form %}
+                    <form style="margin-left: 20px; margin-right: 20px" method="post" id="file_form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.photo }}
+                    </form>
+                {% endif %}
+                <div style="border-radius: 50%; background: url('{{ organizer.organization.photo.url }}'); background-position: center; background-size: cover; width: 250px; height: 250px;" class="logo-login
+                     {% if form %} pointer" onclick="changeImage()">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                             <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                     {% else %}">
+                     {% endif %}</div>
+                {% for error in form.errors %}
+                    <div class="alert alert-danger">{{ form.photo.errors|safe }}</div>
+                {% endfor %}
+                <div class="row margin-top justify-content-md-center">
+                    <div class="col-4" style="text-align: right">
+                        <strong>Organización</strong>
+                    </div>
+                    <div class="col-8">
+                        {{ organizer.organization.name }}
+                    </div>
+                    <div class="col-4" style="text-align: right">
+                        <strong>Nombre</strong>
+                    </div>
+                    <div class="col-8">
+                        {{ organizer.user.first_name }}
+                    </div>
+                    <div class="col-4" style="text-align: right">
+                        <strong>Usuario</strong>
+                    </div>
+                    <div class="col-8">
+                        {{ organizer.user.username }}
+                    </div>
+                    <div class="col-4" style="text-align: right">
+                        <strong>Email</strong>
+                    </div>
+                    <div class="col-8">
+                        {{ organizer.user.email }}
+                    </div>
+                    <div class="col-4" style="text-align: right">
+                        <strong>Admin</strong>
+                    </div>
+                    <div class="col-8">
+                        {{ organizer.admin|yesno }}
+                    </div>
+                    <div class="col-6">
+                        <a href="{% url 'change_password' %}" class="enter btn btn-outline-primary btn-block">Cambiar contraseña</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function changeImage() {
+            let input = document.getElementById('id_photo');
+            input.click();
+        }
+        function  submit() {
+            document.getElementById('file_form').submit();
+        }
+    </script>
+{% endblock %}

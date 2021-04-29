@@ -9,8 +9,8 @@ from django.views.generic import TemplateView
 from django_tables2 import SingleTableView
 
 from user.emails import send_email_invitation
-from user.forms import LoginForm, RegisterForm
-from user.mixins import OrganizerAdminPermission
+from user.forms import LoginForm, RegisterForm, ImageForm, ChangePasswordForm
+from user.mixins import OrganizerAdminPermission, OrganizerPermission
 from user.models import Organizer, Client
 from user.tables import OrganizerTable
 
@@ -102,3 +102,54 @@ def verification_email(request, id, token):
     client.is_verified = True
     client.save()
     return render(request, template_name='verify_user.html', context={})
+
+
+class ProfileView(OrganizerPermission, TemplateView):
+    template_name = 'profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        organizer = get_object_or_404(Organizer, user=self.request.user)
+        form = None
+        if organizer.admin:
+            form = ImageForm()
+        context.update({'form': form, 'organizer': organizer})
+        return context
+
+    def post(self, request):
+        organizer = get_object_or_404(Organizer, user=self.request.user)
+        if not organizer.admin:
+            raise PermissionDenied()
+        form = ImageForm(request.POST, request.FILES, instance=organizer.organization)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('profile'))
+        context = self.get_context_data()
+        context.update({'form': form})
+        return render(request, self.template_name, context)
+
+
+class ChangePassword(OrganizerPermission, TemplateView):
+    template_name = 'change_password.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = ChangePasswordForm()
+        context.update({'form': form})
+        return context
+
+    def post(self, request):
+        user = get_object_or_404(Organizer, user=request.user).user
+        form = ChangePasswordForm(request.POST)
+        if form.is_valid():
+            if user.check_password(form.cleaned_data.get('password_old')):
+                user.set_password(form.cleaned_data.get('password_new'))
+                user.save()
+                djangologin(request, user)
+                return redirect(reverse('profile'))
+            form.add_error('password_old', '')
+            form.add_error(None, 'La contraseña es incorrecta')
+        context = self.get_context_data()
+        context.update({'form': form})
+        return render(request, self.template_name, context)
+
