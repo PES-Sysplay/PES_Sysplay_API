@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin
-from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView, GenericAPIView
+from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from activity.models import Activity, ActivityType, FavoriteActivity
@@ -86,6 +86,3 @@ class FavoriteActivityView(DestroyModelMixin, CreateModelMixin, GenericViewSet):
     def get_object(self):
         activity_id = self.kwargs.get('pk', '')
         return get_object_or_404(FavoriteActivity, activity_id=activity_id, client_id=self.request.user.id)
-
-
-
