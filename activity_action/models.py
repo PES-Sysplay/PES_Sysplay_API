@@ -12,5 +12,9 @@ class ActivityJoined(models.Model):
     date = models.DateTimeField(default=datetime.now)
     checked_in = models.BooleanField(default=False)
 
+    def __str__(self):
+        return '%s - %s' % (self.client.user.username, self.activity)
+
     class Meta:
         unique_together = ('activity', 'client')
+        verbose_name_plural = 'Joined Activities'

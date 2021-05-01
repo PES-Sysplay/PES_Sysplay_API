@@ -34,22 +34,32 @@ class Activity(models.Model):
     organized_by = models.ForeignKey(Organization, on_delete=models.DO_NOTHING, null=True)
     created_by = models.ForeignKey(Organizer, on_delete=models.DO_NOTHING, null=True)
 
+    def __str__(self):
+        return '%s - %s' % (self.organized_by_id, self.name)
+
     class Meta:
         verbose_name_plural = 'Activities'
         unique_together = ('activity_type', 'start_date', 'start_time', 'location', 'organized_by')
 
 
 class InstructedBy(models.Model):
-    organizer = models.ForeignKey(Organizer, on_delete=models.DO_NOTHING, null=False, default=1)
-    activity = models.ForeignKey(Activity, on_delete=models.DO_NOTHING, null=False, default=1)
+    organizer = models.ForeignKey(Organizer, on_delete=models.DO_NOTHING)
+    activity = models.ForeignKey(Activity, on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return '%s - %s' % (self.organizer, self.activity)
 
     class Meta:
         unique_together = ('activity', 'organizer')
 
 
 class FavoriteActivity(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, null=False, default=1)
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, null=False, default=1)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s - %s' % (self.client.user.username, self.activity)
 
     class Meta:
         unique_together = ('client', 'activity')
+        verbose_name_plural = 'Favorite Activities'
