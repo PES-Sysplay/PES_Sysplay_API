@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
-from activity.models import Activity, ActivityType
+from activity.models import Activity, ActivityType, FavoriteActivity
 
 from user.models import Client
 
@@ -16,6 +16,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     timestamp = serializers.SerializerMethodField()
     organization = serializers.SerializerMethodField()
     created = serializers.SerializerMethodField()
+    favorite = serializers.SerializerMethodField()
 
     def get_date_time(self, activity):
         date_time = datetime.combine(activity.start_date, activity.start_time)
@@ -39,11 +40,15 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         date_time = datetime.combine(activity.start_date, activity.start_time)
         return date_time.timestamp()
 
+    def get_favorite(self, activity):
+        request = self.context.get('request')
+        return activity.favoriteactivity_set.filter(client_id=request.user.id).exists()
+
     class Meta:
         model = Activity
         fields = ['id', 'name', 'description', 'photo_url', 'activity_type_id', 'date_time', 'duration',
                   'normal_price', 'member_price', 'number_participants', 'status', 'location', 'only_member',
-                  'organization', 'created', 'timestamp']
+                  'organization', 'created', 'timestamp', 'favorite']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -77,8 +82,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'password', 'token']
 
 
-class ChangePasswordSerializer(serializers.Serializer):
-    model = User
+class ChangePasswordSerializer(serializers.ModelSerializer):
     old_password = serializers.CharField(required=True, write_only=True)
     new_password = serializers.CharField(required=True, write_only=True)
 
@@ -90,8 +94,11 @@ class ChangePasswordSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError("Password error")
 
+    class Meta:
+        model = User
 
-class ActivityTypeSerializer(serializers.Serializer):
+
+class ActivityTypeSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
 
     class Meta:
@@ -99,10 +106,27 @@ class ActivityTypeSerializer(serializers.Serializer):
         fields = ['name']
 
 
-class UserSerializer(serializers.Serializer):
+class UserSerializer(serializers.ModelSerializer):
     email = serializers.CharField()
     username = serializers.CharField()
+    favorites = serializers.SerializerMethodField()
+
+    def get_favorites(self, user):
+        return user.client.favoriteactivity_set.count()
 
     class Meta:
         model = User
-        fields = ['email', 'username']
+        fields = ['email', 'username', 'favorites']
+
+
+class FavoriteActivitySerializer(serializers.ModelSerializer):
+    activity_id = serializers.IntegerField()
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        validated_data['client_id'] = request.user.id
+        return super().create(validated_data)
+
+    class Meta:
+        model = FavoriteActivity
+        fields = ['activity_id']

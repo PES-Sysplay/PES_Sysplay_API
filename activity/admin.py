@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from activity.models import Activity, ActivityType, Joined
+from activity.models import Activity, ActivityType, FavoriteActivity
 
 
 @admin.register(Activity)
@@ -13,6 +13,6 @@ class ActivityTypeAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(Joined)
-class Joined(admin.ModelAdmin):
+@admin.register(FavoriteActivity)
+class FavoriteActivityAdmin(admin.ModelAdmin):
     pass
