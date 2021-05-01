@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 from activity.models import Activity, ActivityType, FavoriteActivity
+from activity_action.models import ActivityJoined
 
 from user.models import Client
 
@@ -17,6 +18,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     organization = serializers.SerializerMethodField()
     created = serializers.SerializerMethodField()
     favorite = serializers.SerializerMethodField()
+    joined = serializers.SerializerMethodField()
 
     def get_date_time(self, activity):
         date_time = datetime.combine(activity.start_date, activity.start_time)
@@ -44,11 +46,15 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         request = self.context.get('request')
         return activity.favoriteactivity_set.filter(client_id=request.user.id).exists()
 
+    def get_joined(self, activity):
+        request = self.context.get('request')
+        return activity.activityjoined_set.filter(client_id=request.user.id).exists()
+
     class Meta:
         model = Activity
         fields = ['id', 'name', 'description', 'photo_url', 'activity_type_id', 'date_time', 'duration',
                   'normal_price', 'member_price', 'number_participants', 'status', 'location', 'only_member',
-                  'organization', 'created', 'timestamp', 'favorite']
+                  'organization', 'created', 'timestamp', 'favorite', 'joined']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -110,16 +116,20 @@ class UserSerializer(serializers.ModelSerializer):
     email = serializers.CharField()
     username = serializers.CharField()
     favorites = serializers.SerializerMethodField()
+    joined = serializers.SerializerMethodField()
 
     def get_favorites(self, user):
         return user.client.favoriteactivity_set.count()
 
+    def get_joined(self, user):
+        return user.client.activityjoined_set.count()
+
     class Meta:
         model = User
-        fields = ['email', 'username', 'favorites']
+        fields = ['email', 'username', 'favorites', 'joined']
 
 
-class FavoriteActivitySerializer(serializers.ModelSerializer):
+class ActionActivitySerializer(serializers.ModelSerializer):
     activity_id = serializers.IntegerField()
 
     def create(self, validated_data):
@@ -128,5 +138,14 @@ class FavoriteActivitySerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     class Meta:
-        model = FavoriteActivity
         fields = ['activity_id']
+
+
+class FavoriteActivitySerializer(ActionActivitySerializer):
+    class Meta(ActionActivitySerializer.Meta):
+        model = FavoriteActivity
+
+
+class ActivityJoinedSerializer(ActionActivitySerializer):
+    class Meta(ActionActivitySerializer.Meta):
+        model = ActivityJoined
