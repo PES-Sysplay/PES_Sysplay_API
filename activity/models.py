@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.db import models
 
-from user.models import Organization, Organizer
+from user.models import Organization, Organizer, Client
 
 from .validators import validate_file_extension
 
@@ -45,3 +45,11 @@ class InstructedBy(models.Model):
 
     class Meta:
         unique_together = ('activity', 'organizer')
+
+
+class FavoriteActivity(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, null=False, default=1)
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, null=False, default=1)
+
+    class Meta:
+        unique_together = ('client', 'activity')
