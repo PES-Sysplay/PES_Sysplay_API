@@ -1,0 +1,1 @@
+Quedan 2 plazas para l'actividad {{ activity.name }}!

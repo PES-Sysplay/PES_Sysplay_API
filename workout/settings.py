@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'activity',
     'api',
     'user',
+    'activity_action',
 ]
 
 MIDDLEWARE = [
