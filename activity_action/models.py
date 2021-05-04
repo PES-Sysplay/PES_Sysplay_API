@@ -18,3 +18,11 @@ class ActivityJoined(models.Model):
     class Meta:
         unique_together = ('activity', 'client')
         verbose_name_plural = 'Joined Activities'
+
+
+class ActivityReport(models.Model):
+    joined = models.OneToOneField(ActivityJoined, on_delete=models.CASCADE, primary_key=True)
+    comment = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return str(self.joined)

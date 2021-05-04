@@ -9,13 +9,13 @@ from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from activity.models import Activity, ActivityType, FavoriteActivity
-from activity_action.models import ActivityJoined
+from activity_action.models import ActivityJoined, ActivityReport
 from api.emails import send_email_verification, send_remainder_email
 from user.mixins import ClientPermission
 from user.models import Client
 
 from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, UserSerializer, \
-    FavoriteActivitySerializer, ActivityJoinedSerializer
+    FavoriteActivitySerializer, ActivityJoinedSerializer, ReportActivitySerializer
 from api.serializers import RegistrationSerializer
 
 
@@ -109,3 +109,15 @@ class JoinActivityView(ActionActivityView):
         activity = Activity.objects.filter(id=activity_id).annotate(count=Count('activityjoined'))[0]
         if activity.count == activity.number_participants - 2:
             send_remainder_email(activity)
+
+
+class ReportActivityView(DestroyModelMixin, CreateModelMixin, GenericViewSet):
+    queryset = ActivityReport.objects.all()
+    serializer_class = ReportActivitySerializer
+    models = ActivityReport
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = [ClientPermission]
+
+    def get_object(self):
+        activity_id = self.kwargs.get('pk', '')
+        return get_object_or_404(self.models, joined__activity_id=activity_id, joined__client_id=self.request.user.id)
