@@ -1,11 +1,13 @@
 from datetime import datetime
 
 from django.contrib.auth.models import User
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 from activity.models import Activity, ActivityType, FavoriteActivity
-from activity_action.models import ActivityJoined
+from activity_action.models import ActivityJoined, ActivityReport
 
 from user.models import Client
 
@@ -20,6 +22,8 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     favorite = serializers.SerializerMethodField()
     joined = serializers.SerializerMethodField()
     clients_joined = serializers.SerializerMethodField()
+    checked_in = serializers.SerializerMethodField()
+    reported = serializers.SerializerMethodField()
 
     def get_date_time(self, activity):
         date_time = datetime.combine(activity.start_date, activity.start_time)
@@ -54,11 +58,26 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     def get_clients_joined(self, activity):
         return activity.activityjoined_set.count()
 
+    def get_checked_in(self, activity):
+        request = self.context.get('request')
+        joined = activity.activityjoined_set.filter(client_id=request.user.id)
+        if len(joined) > 0:
+            return joined[0].checked_in
+        return False
+
+    def get_reported(self, activity):
+        request = self.context.get('request')
+        joined = activity.activityjoined_set.filter(client_id=request.user.id)
+        if len(joined) > 0:
+            return ActivityReport.objects.filter(joined=joined[0].id).exists()
+        return False
+
     class Meta:
         model = Activity
         fields = ['id', 'name', 'description', 'photo_url', 'activity_type_id', 'date_time', 'duration',
                   'normal_price', 'member_price', 'number_participants', 'status', 'location', 'only_member',
-                  'organization', 'created', 'timestamp', 'favorite', 'joined', 'clients_joined']
+                  'organization', 'created', 'timestamp', 'favorite', 'joined', 'clients_joined', 'checked_in',
+                  'reported']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -153,3 +172,32 @@ class FavoriteActivitySerializer(ActionActivitySerializer):
 class ActivityJoinedSerializer(ActionActivitySerializer):
     class Meta(ActionActivitySerializer.Meta):
         model = ActivityJoined
+
+    def create(self, validated_data):
+        activity_id = validated_data.get('activity_id', '')
+        activity = get_object_or_404(Activity, id=activity_id)
+        if activity.number_participants < activity.activityjoined_set.count() + 1:
+            raise serializers.ValidationError({"detail": "Activity full"})
+        return super().create(validated_data)
+
+
+class ReportActivitySerializer(serializers.ModelSerializer):
+    activity_id = serializers.IntegerField(source='joined__activity_id', required=False)
+    joined_id = serializers.IntegerField(required=False, write_only=True)
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        activity_id = validated_data.get('joined__activity_id', '')
+        joined = get_object_or_404(ActivityJoined, activity_id=activity_id, client_id=request.user.id, checked_in=True)
+        try:
+            ActivityReport.objects.get(joined_id=joined.id)
+            raise Http404
+        except ActivityReport.DoesNotExist:
+            pass
+        del validated_data['joined__activity_id']
+        validated_data['joined_id'] = joined.id
+        return super().create(validated_data)
+
+    class Meta:
+        fields = ['activity_id', 'comment', 'joined_id']
+        model = ActivityReport
