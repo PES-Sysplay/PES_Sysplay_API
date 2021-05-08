@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 
 from api.views import ActivityViewSet, ClientViewSet, ChangePasswordView, ActivityTypeViewSet, UserClientView, \
-    FavoriteActivityView, JoinActivityView, ReportActivityView
+    FavoriteActivityView, JoinActivityView, ReportActivityView, GoogleLoginView
 from rest_framework.authtoken import views
 
 router = routers.DefaultRouter()
@@ -18,4 +18,5 @@ urlpatterns = [
     path('change_password/', ChangePasswordView.as_view(), name='change-password'),
     path('me/', UserClientView.as_view(), name='client'),
     path('login/', views.obtain_auth_token),
+    path('login/google/', GoogleLoginView),
 ]

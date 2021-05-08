@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 
 from activity.validators import validate_file_extension
 
@@ -32,3 +33,19 @@ class Client(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def get_token(self):
+        try:
+            return Token.objects.get(user_id=self.user_id).key
+        except Token.DoesNotExist:
+            token = Token(user_id=self.user_id)
+            token.save()
+            return token
+
+    @staticmethod
+    def create_client_from_google(email):
+        user = User(username=email, password='', email=email)
+        user.save()
+        client = Client(user=user, is_verified=True)
+        client.save()
+        return client
