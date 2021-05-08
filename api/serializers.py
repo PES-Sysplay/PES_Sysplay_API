@@ -7,7 +7,7 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 from activity.models import Activity, ActivityType, FavoriteActivity
-from activity_action.models import ActivityJoined, ActivityReport
+from activity_action.models import ActivityJoined, ActivityReport, ActivityReview
 
 from user.models import Client
 
@@ -189,7 +189,7 @@ class ActivityJoinedSerializer(ActionActivitySerializer):
         return super().create(validated_data)
 
 
-class ReportActivitySerializer(serializers.ModelSerializer):
+class ActionActivitySerializer(serializers.ModelSerializer):
     activity_id = serializers.IntegerField(source='joined__activity_id', required=False)
     joined_id = serializers.IntegerField(required=False, write_only=True)
 
@@ -198,14 +198,22 @@ class ReportActivitySerializer(serializers.ModelSerializer):
         activity_id = validated_data.get('joined__activity_id', '')
         joined = get_object_or_404(ActivityJoined, activity_id=activity_id, client_id=request.user.id, checked_in=True)
         try:
-            ActivityReport.objects.get(joined_id=joined.id)
+            self.Meta.model.objects.get(joined_id=joined.id)
             raise Http404
-        except ActivityReport.DoesNotExist:
+        except self.Meta.model.DoesNotExist:
             pass
         del validated_data['joined__activity_id']
         validated_data['joined_id'] = joined.id
         return super().create(validated_data)
 
+
+class ReportActivitySerializer(ActionActivitySerializer):
     class Meta:
         fields = ['activity_id', 'comment', 'joined_id']
         model = ActivityReport
+
+
+class ReviewActivitySerializer(ActionActivitySerializer):
+    class Meta:
+        fields = ['activity_id', 'comment', 'joined_id', 'stars']
+        model = ActivityReview
