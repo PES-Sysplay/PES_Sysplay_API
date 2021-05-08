@@ -130,8 +130,11 @@ class GoogleLoginView(APIView):
     def get(self, request):
         token = request.GET.get('token', '')
         if not token:
-            return HttpResponseBadRequest()
-        email = GoogleOauth(token=token).get_email()
+            return HttpResponseBadRequest('Invalid token')
+        try:
+            email = GoogleOauth(token=token).get_email()
+        except GoogleOauth.InvalidToken:
+            return HttpResponseBadRequest('Invalid token')
         try:
             client = Client.objects.get(user__username=email)
         except Client.DoesNotExist:
