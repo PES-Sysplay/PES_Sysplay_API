@@ -18,5 +18,5 @@ urlpatterns = [
     path('change_password/', ChangePasswordView.as_view(), name='change-password'),
     path('me/', UserClientView.as_view(), name='client'),
     path('login/', views.obtain_auth_token),
-    path('login/google/', GoogleLoginView),
+    path('login/google/', GoogleLoginView.as_view()),
 ]

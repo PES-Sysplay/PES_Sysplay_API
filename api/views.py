@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
-from django.http import HttpResponseBadRequest, HttpResponse
+from django.http import HttpResponseBadRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework.authentication import TokenAuthentication
@@ -131,10 +131,10 @@ class GoogleLoginView(APIView):
         token = request.GET.get('token', '')
         if not token:
             return HttpResponseBadRequest()
-        email = GoogleOauth(token).get_email()
+        email = GoogleOauth(token=token).get_email()
         try:
             client = Client.objects.get(user__username=email)
         except Client.DoesNotExist:
             client = Client.create_client_from_google(email=email)
         token = client.get_token()
-        return HttpResponse({'token': token})
+        return JsonResponse({'token': token})
