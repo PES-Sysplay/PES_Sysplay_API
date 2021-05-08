@@ -1,11 +1,13 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin
 from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView
+from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from activity.models import Activity, ActivityType, FavoriteActivity
@@ -17,6 +19,7 @@ from user.models import Client
 from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, UserSerializer, \
     FavoriteActivitySerializer, ActivityJoinedSerializer, ReportActivitySerializer
 from api.serializers import RegistrationSerializer
+from user.services import GoogleOauth
 
 
 class ActivityViewSet(ReadOnlyModelViewSet):
@@ -121,3 +124,20 @@ class ReportActivityView(DestroyModelMixin, CreateModelMixin, GenericViewSet):
     def get_object(self):
         activity_id = self.kwargs.get('pk', '')
         return get_object_or_404(self.models, joined__activity_id=activity_id, joined__client_id=self.request.user.id)
+
+
+class GoogleLoginView(APIView):
+    def get(self, request):
+        token = request.GET.get('token', '')
+        if not token:
+            return HttpResponseBadRequest('Invalid token')
+        try:
+            email = GoogleOauth(token=token).get_email()
+        except GoogleOauth.InvalidToken:
+            return HttpResponseBadRequest('Invalid token')
+        try:
+            client = Client.objects.get(user__username=email)
+        except Client.DoesNotExist:
+            client = Client.create_client_from_google(email=email)
+        token = client.get_token()
+        return JsonResponse({'token': token})

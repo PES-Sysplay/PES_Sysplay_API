@@ -147,3 +147,5 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')
+
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', None)
