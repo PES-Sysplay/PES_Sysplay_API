@@ -29,7 +29,7 @@ class ActivityViewSet(ReadOnlyModelViewSet):
     permission_classes = [ClientPermission]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().exclude(status=Activity.STATUS_CANCELLED)
         if self.request.GET.get('favorite', False):
             queryset = queryset.filter(favoriteactivity__client_id=self.request.user.id)
         if self.request.GET.get('joined', False):
@@ -92,7 +92,8 @@ class ActionActivityView(DestroyModelMixin, CreateModelMixin, GenericViewSet):
 
     def get_object(self):
         activity_id = self.kwargs.get('pk', '')
-        return get_object_or_404(self.models, activity_id=activity_id, client_id=self.request.user.id)
+        return get_object_or_404(self.models, activity_id=activity_id, client_id=self.request.user.id,
+                                 activity__status=Activity.STATUS_PENDING)
 
 
 class FavoriteActivityView(ActionActivityView):

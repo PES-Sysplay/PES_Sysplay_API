@@ -1,8 +1,10 @@
+from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
+from django.views import View
 from django.views.generic import TemplateView
 
-from activity.emails import send_email_activity_changed
+from activity.emails import send_email_activity_changed, send_email_activity_cancelled
 from activity.form import ActivityForm
 from activity.models import Activity
 from user.mixins import OrganizerPermission, OrganizerActivityPermission
@@ -27,6 +29,16 @@ class ActivityCreate(OrganizerPermission, FormView):
 class ActivityView(OrganizerActivityPermission, ActivityCreate):
     template_name = 'create_activity.html'
     form_class = ActivityForm
+
+    def get_context_data(self, model_object=None, **kwargs):
+        context = super().get_context_data(model_object, **kwargs)
+        model_object = self.get_model_object()
+        if model_object:
+            reports = set(model_object.activityjoined_set.all().values_list('activityreport__comment', flat=True))
+            if None in reports:
+                reports.remove(None)
+            context.update({'reports': reports})
+        return context
 
     def set_form(self, form):
         form.set_read_only()
@@ -59,3 +71,13 @@ class ActivityListView(OrganizerPermission, TemplateView):
         activities = Activity.objects.filter(organized_by=organizer.organization).order_by('start_date')
         context.update({'activities': activities})
         return context
+
+
+class ActivityCancelView(OrganizerActivityPermission, View):
+    def get(self, request, id):
+        activity = get_object_or_404(Activity, pk=id)
+        activity.status = Activity.STATUS_CANCELLED
+        activity.save()
+        send_email_activity_cancelled(activity)
+        messages.success(request, 'Actividad cancelada')
+        return redirect(reverse('view_activity', args=[id]))
