@@ -2,6 +2,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.views.generic import TemplateView
 
+from activity.emails import send_email_activity_changed
 from activity.form import ActivityForm
 from activity.models import Activity
 from user.mixins import OrganizerPermission, OrganizerActivityPermission
@@ -41,9 +42,12 @@ class ActivityEdit(OrganizerActivityPermission, ActivityCreate):
     def get_model_object(self, *args, **kwargs):
         m_id = self.kwargs.get('id')
         activity = get_object_or_404(Activity, pk=m_id)
-        # if activity.org != self.request.user.org:
-        #     raise PermissionDenied()
         return activity
+
+    def save_model(self, model_object):
+        old_object = self.get_model_object()
+        super().save_model(model_object)
+        send_email_activity_changed(old=old_object, new=model_object)
 
 
 class ActivityListView(OrganizerPermission, TemplateView):
