@@ -24,6 +24,14 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     clients_joined = serializers.SerializerMethodField()
     checked_in = serializers.SerializerMethodField()
     reported = serializers.SerializerMethodField()
+    token = serializers.SerializerMethodField()
+
+    def get_token(self, activity):
+        request = self.context.get('request')
+        joined = activity.activityjoined_set.filter(client_id=request.user.id)
+        if len(joined) == 0:
+            return None
+        return joined[0].token
 
     def get_date_time(self, activity):
         date_time = datetime.combine(activity.start_date, activity.start_time)
@@ -77,7 +85,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'name', 'description', 'photo_url', 'activity_type_id', 'date_time', 'duration',
                   'normal_price', 'member_price', 'number_participants', 'status', 'location', 'only_member',
                   'organization', 'created', 'timestamp', 'favorite', 'joined', 'clients_joined', 'checked_in',
-                  'reported']
+                  'reported', 'token']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
