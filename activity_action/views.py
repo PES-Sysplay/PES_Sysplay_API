@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django_tables2 import SingleTableView
