@@ -6,7 +6,15 @@
             {% csrf_token %}
             {% include 'include/bootstrap_form.html' with form=form %}
             {% if form.is_read_only %}
-                <a href="{% url "edit_activity" form.instance.pk %}" class="edit-btn button btn btn-block btn-success">Editar Actividad</a>
+                <div class="row justify-content-center">
+                    <div class="col-3">
+                        <a href="{% url "checkin-list" form.instance.pk %}" class="button btn btn-block btn-success">Checkin</a>
+                    </div>
+                    <div class="col-3">
+                        <a href="{% url "edit_activity" form.instance.pk %}" class="button btn btn-block btn-success">Editar Actividad</a>
+                    </div>
+
+                </div>
             {% else %}
                 <button type="submit" class="button btn btn-block btn-success">Guardar Actividad!</button>
             {% endif %}

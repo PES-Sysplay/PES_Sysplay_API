@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from django.db import models
@@ -11,6 +12,7 @@ class ActivityJoined(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     date = models.DateTimeField(default=datetime.now)
     checked_in = models.BooleanField(default=False)
+    token = models.UUIDField(default=uuid.uuid4, unique=True)
 
     def __str__(self):
         return '%s - %s' % (self.client.user.username, self.activity)
