@@ -16,7 +16,8 @@ class ActivityType(models.Model):
 
 class Activity(models.Model):
     STATUS_PENDING = 'P'
-    STATUS_CHOICES = [(STATUS_PENDING, 'Pendiente'), ('C', 'Cancelada'), ('D', 'Finalizada')]
+    STATUS_CANCELLED = 'C'
+    STATUS_CHOICES = [(STATUS_PENDING, 'Pendiente'), (STATUS_CANCELLED, 'Cancelada'), ('D', 'Finalizada')]
 
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=1000)
