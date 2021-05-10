@@ -133,6 +133,7 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
+        fields = ['old_password', 'new_password']
 
 
 class ActivityTypeSerializer(serializers.ModelSerializer):
