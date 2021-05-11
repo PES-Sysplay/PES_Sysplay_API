@@ -42,7 +42,8 @@ class ActivityForm(BootstrapFormMixin, forms.ModelForm):
 
         }
         help_texts = {
-            'duration': 'In minutes'
+            'duration': 'En minutos',
+            'location': 'En coordinadas. Ejemplo: 41.326371, 2.249145'
         }
         widgets = {
             'duration': forms.NumberInput(attrs={'id': 'form_homework', 'step': "0.01"}),
