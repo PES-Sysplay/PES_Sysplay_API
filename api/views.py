@@ -1,23 +1,23 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
-from rest_framework.mixins import CreateModelMixin, DestroyModelMixin
+from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, ListModelMixin
 from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from activity.models import Activity, ActivityType, FavoriteActivity
-from activity_action.models import ActivityJoined, ActivityReport
+from activity_action.models import ActivityJoined, ActivityReport, ActivityReview
 from api.emails import send_email_verification, send_remainder_email
 from user.mixins import ClientPermission
 from user.models import Client
 
 from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, UserSerializer, \
-    FavoriteActivitySerializer, ActivityJoinedSerializer, ReportActivitySerializer
+    FavoriteActivitySerializer, ActivityJoinedSerializer, ReportActivitySerializer, ReviewActivitySerializer
 from api.serializers import RegistrationSerializer
 from user.services import GoogleOauth
 
@@ -115,16 +115,30 @@ class JoinActivityView(ActionActivityView):
             send_remainder_email(activity)
 
 
-class ReportActivityView(DestroyModelMixin, CreateModelMixin, GenericViewSet):
-    queryset = ActivityReport.objects.all()
-    serializer_class = ReportActivitySerializer
-    models = ActivityReport
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
-    permission_classes = [ClientPermission]
-
+class ActionInsideActivityView(ActionActivityView):
     def get_object(self):
         activity_id = self.kwargs.get('pk', '')
         return get_object_or_404(self.models, joined__activity_id=activity_id, joined__client_id=self.request.user.id)
+
+
+class ReportActivityView(ActionInsideActivityView):
+    queryset = ActivityReport.objects.all()
+    serializer_class = ReportActivitySerializer
+    models = ActivityReport
+
+
+class ReviewActivityView(ListModelMixin, ActionInsideActivityView):
+    queryset = ActivityReview.objects.all()
+    serializer_class = ReviewActivitySerializer
+    models = ActivityReview
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        organization = self.request.GET.get('organization', None)
+        if not organization:
+            raise Http404
+        queryset = queryset.filter(joined__activity__organized_by=organization)
+        return queryset
 
 
 class GoogleLoginView(APIView):

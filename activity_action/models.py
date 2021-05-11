@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
 
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 from activity.models import Activity
@@ -19,12 +20,21 @@ class ActivityJoined(models.Model):
 
     class Meta:
         unique_together = ('activity', 'client')
-        verbose_name_plural = 'Joined Activities'
+        verbose_name_plural = 'Activity Joined'
 
 
 class ActivityReport(models.Model):
     joined = models.OneToOneField(ActivityJoined, on_delete=models.CASCADE, primary_key=True)
     comment = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return str(self.joined)
+
+
+class ActivityReview(models.Model):
+    joined = models.OneToOneField(ActivityJoined, on_delete=models.CASCADE, primary_key=True)
+    comment = models.CharField(max_length=1000, blank=True)
+    stars = models.FloatField(validators=[MaxValueValidator(5), MinValueValidator(0)])
 
     def __str__(self):
         return str(self.joined)

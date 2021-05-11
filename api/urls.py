@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 
 from api.views import ActivityViewSet, ClientViewSet, ChangePasswordView, ActivityTypeViewSet, UserClientView, \
-    FavoriteActivityView, JoinActivityView, ReportActivityView, GoogleLoginView
+    FavoriteActivityView, JoinActivityView, ReportActivityView, ReviewActivityView, GoogleLoginView
 from rest_framework.authtoken import views
 
 router = routers.DefaultRouter()
@@ -12,6 +12,7 @@ router.register(r'activitytype', ActivityTypeViewSet)
 router.register(r'favorite', FavoriteActivityView)
 router.register(r'join', JoinActivityView)
 router.register(r'report', ReportActivityView)
+router.register(r'review', ReviewActivityView)
 
 urlpatterns = [
     path('', include(router.urls)),
