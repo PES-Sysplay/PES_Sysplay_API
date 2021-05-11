@@ -4,7 +4,7 @@ from django.db.models import Count
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin
 from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView
 from rest_framework.views import APIView
@@ -25,7 +25,7 @@ from user.services import GoogleOauth
 class ActivityViewSet(ReadOnlyModelViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
 
     def get_queryset(self):
@@ -52,7 +52,7 @@ class ChangePasswordView(UpdateAPIView):
     serializer_class = ChangePasswordSerializer
     queryset = User.objects.all()
     model = User
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
 
     def get_object(self):
@@ -65,7 +65,7 @@ class ChangePasswordView(UpdateAPIView):
 class ActivityTypeViewSet(ReadOnlyModelViewSet):
     serializer_class = ActivityTypeSerializer
     queryset = ActivityType.objects.all()
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
 
 
@@ -73,7 +73,7 @@ class UserClientView(RetrieveDestroyAPIView):
     queryset = Client.objects.all()
     serializer_class = UserSerializer
     model = User
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
 
     def get_object(self):
@@ -87,7 +87,7 @@ class ActionActivityView(DestroyModelMixin, CreateModelMixin, GenericViewSet):
     queryset = None
     serializer_class = None
     models = None
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
 
     def get_object(self):
@@ -119,7 +119,7 @@ class ReportActivityView(DestroyModelMixin, CreateModelMixin, GenericViewSet):
     queryset = ActivityReport.objects.all()
     serializer_class = ReportActivitySerializer
     models = ActivityReport
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
 
     def get_object(self):
