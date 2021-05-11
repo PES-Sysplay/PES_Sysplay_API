@@ -77,10 +77,6 @@ TEMPLATES = [
     },
 ]
 
-TEMPLATE_LOADERS = [
-    'django.template.loaders.filesystem.Loader',
-]
-
 WSGI_APPLICATION = 'workout.wsgi.application'
 
 

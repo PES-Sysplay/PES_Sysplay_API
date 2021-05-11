@@ -22,7 +22,13 @@ bootstrap_field_info = {'': {'fields': [{'name': 'name', 'space': 6},
 
 class ActivityForm(BootstrapFormMixin, forms.ModelForm):
     bootstrap_field_info = bootstrap_field_info
-    photo = forms.ImageField(required=False)
+    photo = forms.FileField(required=False, label='Imagen')
+
+    def clean_photo(self):
+        photo = self.cleaned_data.get('photo', '')
+        if not photo:
+            self.add_error('photo', 'Imagen requerida')
+        return photo
 
     class Meta:
         model = Activity
@@ -31,7 +37,6 @@ class ActivityForm(BootstrapFormMixin, forms.ModelForm):
             'name': 'Nombre de la actividad',
             'activity_type': 'Tipo de actividad',
             'description': 'Descripción',
-            'photo': 'Imagen',
             'start_date': 'Fecha de inicio',
             'start_time': 'Hora de inicio',
             'duration': 'Duración de la actividad',
