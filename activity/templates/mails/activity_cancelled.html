@@ -1,0 +1,28 @@
+{% extends 'mails/base.html' %}
+
+{% block main %}
+<table class="main"
+   style="border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;border-radius:3px;width:100%;background-color: #EEEEEE; color: black">
+<!-- START MAIN CONTENT AREA -->
+<tr>
+    <td class="wrapper"
+        style="font-family:sans-serif;font-size:14px;vertical-align:top;box-sizing:border-box;padding:20px;">
+
+        <table border="0" cellpadding="0" cellspacing="0"
+               style="border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;width:100%;">
+            <tr>
+                <td style="font-family:sans-serif;font-size:14px;vertical-align:top;">
+                    {% block content %}
+                        <p>Has sido notificado ya que se ha cancelado l'actividad en la cual te habias apuntado anteriormente: <strong>{{ activity.name }}</strong></p>
+                        <p>Esperamos que tenga un buen dia</p>
+                        <br>
+                        <p>Workout</p>
+                    {% endblock %}
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+<!-- END MAIN CONTENT AREA -->
+</table>
+{% endblock %}

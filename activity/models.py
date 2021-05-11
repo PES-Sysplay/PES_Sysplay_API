@@ -16,7 +16,8 @@ class ActivityType(models.Model):
 
 class Activity(models.Model):
     STATUS_PENDING = 'P'
-    STATUS_CHOICES = [(STATUS_PENDING, 'Pendiente'), ('C', 'Cancelada'), ('D', 'Finalizada')]
+    STATUS_CANCELLED = 'C'
+    STATUS_CHOICES = [(STATUS_PENDING, 'Pendiente'), (STATUS_CANCELLED, 'Cancelada'), ('D', 'Finalizada')]
 
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=1000)
@@ -24,7 +25,7 @@ class Activity(models.Model):
     activity_type = models.ForeignKey(ActivityType, on_delete=models.DO_NOTHING)
     start_date = models.DateField(default=datetime.now)
     start_time = models.TimeField(default=datetime.now)
-    duration = models.FloatField()
+    duration = models.IntegerField()
     normal_price = models.FloatField()
     member_price = models.FloatField(null=True)
     number_participants = models.IntegerField()

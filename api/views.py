@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, ListModelMixin
 from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView
+from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from activity.models import Activity, ActivityType, FavoriteActivity
@@ -18,16 +19,17 @@ from user.models import Client
 from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, UserSerializer, \
     FavoriteActivitySerializer, ActivityJoinedSerializer, ReportActivitySerializer, ReviewActivitySerializer
 from api.serializers import RegistrationSerializer
+from user.services import GoogleOauth
 
 
 class ActivityViewSet(ReadOnlyModelViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().exclude(status=Activity.STATUS_CANCELLED)
         if self.request.GET.get('favorite', False):
             queryset = queryset.filter(favoriteactivity__client_id=self.request.user.id)
         if self.request.GET.get('joined', False):
@@ -50,7 +52,7 @@ class ChangePasswordView(UpdateAPIView):
     serializer_class = ChangePasswordSerializer
     queryset = User.objects.all()
     model = User
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
 
     def get_object(self):
@@ -63,7 +65,7 @@ class ChangePasswordView(UpdateAPIView):
 class ActivityTypeViewSet(ReadOnlyModelViewSet):
     serializer_class = ActivityTypeSerializer
     queryset = ActivityType.objects.all()
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
 
 
@@ -71,7 +73,7 @@ class UserClientView(RetrieveDestroyAPIView):
     queryset = Client.objects.all()
     serializer_class = UserSerializer
     model = User
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
 
     def get_object(self):
@@ -85,12 +87,13 @@ class ActionActivityView(DestroyModelMixin, CreateModelMixin, GenericViewSet):
     queryset = None
     serializer_class = None
     models = None
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
 
     def get_object(self):
         activity_id = self.kwargs.get('pk', '')
-        return get_object_or_404(self.models, activity_id=activity_id, client_id=self.request.user.id)
+        return get_object_or_404(self.models, activity_id=activity_id, client_id=self.request.user.id,
+                                 activity__status=Activity.STATUS_PENDING)
 
 
 class FavoriteActivityView(ActionActivityView):
@@ -138,3 +141,18 @@ class ReviewActivityView(ListModelMixin, ActionInsideActivityView):
         return queryset
 
 
+class GoogleLoginView(APIView):
+    def get(self, request):
+        token = request.GET.get('token', '')
+        if not token:
+            return HttpResponseBadRequest('Invalid token')
+        try:
+            email = GoogleOauth(token=token).get_email()
+        except GoogleOauth.InvalidToken:
+            return HttpResponseBadRequest('Invalid token')
+        try:
+            client = Client.objects.get(user__username=email)
+        except Client.DoesNotExist:
+            client = Client.create_client_from_google(email=email)
+        token = client.get_token()
+        return JsonResponse({'token': token})

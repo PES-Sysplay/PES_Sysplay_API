@@ -4,21 +4,42 @@
         <div class="col-10">
             <form method='post' enctype="multipart/form-data">
             {% csrf_token %}
+            {% include 'include/messages.html' %}
             {% include 'include/bootstrap_form.html' with form=form %}
             {% if form.is_read_only %}
-                <div class="row justify-content-center">
-                    <div class="col-3">
-                        <a href="{% url "checkin-list" form.instance.pk %}" class="button btn btn-block btn-success">Checkin</a>
-                    </div>
-                    <div class="col-3">
-                        <a href="{% url "edit_activity" form.instance.pk %}" class="button btn btn-block btn-success">Editar Actividad</a>
-                    </div>
+                {% if reports %}
+                    <strong>Reports:</strong>
+                    <ul>
+                    {% for rep in reports %}
+                        <li>{{ rep }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if form.instance.status != 'C' %}
+                    <div class="row justify-content-center">
+                        <div class="d-grid gap-2 col-3 mx-auto">
+                            <a href="{% url "checkin-list" form.instance.pk %}" class="btn btn-block btn-primary">Checkin</a>
+                        </div>
+                        <div class="d-grid gap-2 col-3 mx-auto">
+                            <a href="{% url "edit_activity" form.instance.pk %}" class="btn btn-block btn-primary">Editar Actividad</a>
+                        </div>
+                        <div class="d-grid gap-2 col-3 mx-auto">
+                            <a href="{% url "cancel_activity" form.instance.pk %}" onclick="return confirm('Confirmas cancelar la actividad?')" class="btn btn-block btn-danger">Cancelar Actividad</a>
+                        </div>
 
-                </div>
+                    </div>
+                {% endif %}
             {% else %}
                 <button type="submit" class="button btn btn-block btn-success">Guardar Actividad!</button>
             {% endif %}
             </form>
         </div>
     </div>
+    <script>
+        function deleteUser(url) {
+          if (confirm("Confirma para borrar el usuario")) {
+            location.href = url;
+          }
+        }
+    </script>
 {% endblock %}

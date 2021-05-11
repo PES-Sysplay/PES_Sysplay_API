@@ -9,9 +9,11 @@
         <div class="col">
             <a href="{% url 'view_activity' activity.id %}">
                 <div class="card" >
-                    <div style="background-image: url('{{ activity.photo.url }}'); background-size: 100% auto; background-position: center; height: 300px"></div>
+                    <div style="background-image: url('{{ activity.photo.url }}'); background-position: center; height: 300px">
+                        <span style="margin-top: 10px; margin-left: 10px" class="badge bg-{% if activity.status == 'P' %}success{% else %}danger{% endif %}">{{ activity.get_status_display }}</span>
+                    </div>
                     <div class="card-body" style="background: white">
-                        <h5 class="card-title">{{ activity.name }}</h5>
+                        <h5 class="card-title">{{ activity.name }} - {{ activity.start_date }}</h5>
                         <p class="card-text">{{ activity.description|truncatechars:30 }}</p>
                     </div>
                 </div>
