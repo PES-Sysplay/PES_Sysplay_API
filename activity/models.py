@@ -25,7 +25,7 @@ class Activity(models.Model):
     activity_type = models.ForeignKey(ActivityType, on_delete=models.DO_NOTHING)
     start_date = models.DateField(default=datetime.now)
     start_time = models.TimeField(default=datetime.now)
-    duration = models.FloatField()
+    duration = models.IntegerField()
     normal_price = models.FloatField()
     member_price = models.FloatField(null=True)
     number_participants = models.IntegerField()
