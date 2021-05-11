@@ -22,6 +22,7 @@ bootstrap_field_info = {'': {'fields': [{'name': 'name', 'space': 6},
 
 class ActivityForm(BootstrapFormMixin, forms.ModelForm):
     bootstrap_field_info = bootstrap_field_info
+    photo = forms.ImageField(required=False)
 
     class Meta:
         model = Activity
