@@ -34,7 +34,7 @@ class ActivityReport(models.Model):
 class ActivityReview(models.Model):
     joined = models.OneToOneField(ActivityJoined, on_delete=models.CASCADE, primary_key=True)
     comment = models.CharField(max_length=1000, blank=True)
-    stars = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(1)])
+    stars = models.FloatField(validators=[MaxValueValidator(5), MinValueValidator(0)])
 
     def __str__(self):
         return str(self.joined)
