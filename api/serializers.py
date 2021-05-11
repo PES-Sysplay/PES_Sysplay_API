@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 from django.contrib.auth.models import User
 from django.http import Http404
@@ -16,6 +16,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     photo_url = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     date_time = serializers.SerializerMethodField()
+    date_time_finish = serializers.SerializerMethodField()
     timestamp = serializers.SerializerMethodField()
     organization = serializers.SerializerMethodField()
     created = serializers.SerializerMethodField()
@@ -34,7 +35,12 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         return joined[0].token
 
     def get_date_time(self, activity):
-        date_time = datetime.combine(activity.start_date, activity.start_time)
+        date_time = datetime.datetime.combine(activity.start_date, activity.start_time)
+        return date_time.strftime("%b %d, %Y, %H:%M")
+
+    def get_date_time_finish(self, activity):
+        date_time = datetime.datetime.combine(activity.start_date, activity.start_time)
+        date_time = date_time + datetime.timedelta(minutes=activity.duration)
         return date_time.strftime("%b %d, %Y, %H:%M")
 
     def get_status(self, activity):
@@ -52,7 +58,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         return activity.created_by.user.first_name
 
     def get_timestamp(self, activity):
-        date_time = datetime.combine(activity.start_date, activity.start_time)
+        date_time = datetime.datetime.combine(activity.start_date, activity.start_time)
         return date_time.timestamp()
 
     def get_favorite(self, activity):
@@ -85,7 +91,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'name', 'description', 'photo_url', 'activity_type_id', 'date_time', 'duration',
                   'normal_price', 'member_price', 'number_participants', 'status', 'location', 'only_member',
                   'organization', 'created', 'timestamp', 'favorite', 'joined', 'clients_joined', 'checked_in',
-                  'reported', 'token']
+                  'reported', 'token', 'date_time_finish']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

@@ -118,6 +118,9 @@ ul {
     padding-top: 10px;
     text-align: center;
 }
+.form-text{
+    color: white !important;
+}
 .mb-3 a{
     color: white;
 }

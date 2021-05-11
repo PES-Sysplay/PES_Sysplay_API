@@ -41,7 +41,9 @@ class ActivityForm(BootstrapFormMixin, forms.ModelForm):
             'only_member': 'Solo para socios'
 
         }
-
+        help_texts = {
+            'duration': 'In minutes'
+        }
         widgets = {
             'duration': forms.NumberInput(attrs={'id': 'form_homework', 'step': "0.01"}),
             'normal_price': forms.NumberInput(attrs={'id': 'form_homework', 'step': "0.01"}),
