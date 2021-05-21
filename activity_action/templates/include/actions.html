@@ -1,0 +1,5 @@
+{% if record.client_id in blocked %}
+    <a class="btn btn-success" href="{% url 'unblock-user' id record.client_id %}">Desbloquear</a>
+{% else %}
+    <a class="btn btn-danger" href="{% url 'block-user' id record.client_id %}">Bloquear</a>
+{% endif %}
