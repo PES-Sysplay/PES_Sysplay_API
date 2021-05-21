@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, ListModelMixin, UpdateModelMixin
-from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView, GenericAPIView
+from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
@@ -171,4 +171,3 @@ class ProfileView(UpdateAPIView, APIView):
 
     def get_object(self):
         return self.request.user.client
-
