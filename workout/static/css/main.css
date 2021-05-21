@@ -118,6 +118,9 @@ ul {
     padding-top: 10px;
     text-align: center;
 }
+.form-text{
+    color: white !important;
+}
 .mb-3 a{
     color: white;
 }
@@ -198,6 +201,10 @@ th > a:hover, td > a:hover {
     padding-bottom: 10px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.pointer {
+    cursor: pointer;
 }
 
 .no-account{

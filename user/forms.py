@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from user.models import Organizer
+from user.models import Organizer, Organization
 
 
 class LoginForm(forms.Form):
@@ -39,3 +39,28 @@ class RegisterForm(LoginForm):
         )
         organizer.save()
         return organizer
+
+
+class ImageForm(forms.ModelForm):
+    class Meta:
+        model = Organization
+        fields = ['photo']
+        widgets = {
+            'photo': forms.FileInput(attrs={'onchange': 'submit()', 'hidden': True})
+        }
+
+
+class ChangePasswordForm(forms.Form):
+    password_old = forms.CharField(required=True, widget=forms.PasswordInput())
+    password_new = forms.CharField(required=True, widget=forms.PasswordInput())
+    password_new2 = forms.CharField(required=True, widget=forms.PasswordInput())
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password_new', '')
+        password2 = cleaned_data.get('password_new2', '')
+        if not password1 or not password2 or password2 != password1:
+            self.add_error('password_new', '')
+            self.add_error('password_new2', '')
+            self.add_error(None, 'Las contraseñas no coinciden.')
+        return cleaned_data

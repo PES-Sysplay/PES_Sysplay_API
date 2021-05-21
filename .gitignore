@@ -4,4 +4,4 @@ venv/
 *.sqlite3
 __pycache__/
 files/*
-mails/
+/mails/
