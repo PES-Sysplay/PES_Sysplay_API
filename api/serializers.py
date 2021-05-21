@@ -26,6 +26,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     checked_in = serializers.SerializerMethodField()
     reported = serializers.SerializerMethodField()
     token = serializers.SerializerMethodField()
+    superhost = serializers.SerializerMethodField()
 
     def get_token(self, activity):
         request = self.context.get('request')
@@ -86,12 +87,15 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
             return ActivityReport.objects.filter(joined=joined[0].id).exists()
         return False
 
+    def get_superhost(self, activity):
+        return activity.organized_by.superhost
+
     class Meta:
         model = Activity
         fields = ['id', 'name', 'description', 'photo_url', 'activity_type_id', 'date_time', 'duration',
                   'normal_price', 'member_price', 'number_participants', 'status', 'location', 'only_member',
                   'organization', 'created', 'timestamp', 'favorite', 'joined', 'clients_joined', 'checked_in',
-                  'reported', 'token', 'date_time_finish']
+                  'reported', 'token', 'date_time_finish', 'superhost']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

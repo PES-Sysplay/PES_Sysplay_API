@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 
 from django.contrib.auth.models import User
+from django.db.models import Avg, Count
 from rest_framework.authtoken.models import Token
 
 from activity.validators import validate_file_extension
@@ -10,8 +11,19 @@ from activity.validators import validate_file_extension
 
 class Organization(models.Model):
     name = models.CharField(primary_key=True, max_length=100)
-    super_host = models.BooleanField(default=False)
     photo = models.FileField(validators=[validate_file_extension], upload_to="user", null=True)
+
+    @property
+    def superhost(self):
+        average = self.activity_set.values('organized_by').aggregate(
+            average=Avg('activityjoined__activityreview__stars'))['average']
+        count_neg = self.activity_set.values('organized_by').aggregate(
+            count=Count('activityjoined__activityreport'))['count']
+        count_pos = self.activity_set.values('organized_by').filter(activityjoined__activityreview__stars__gte=4) \
+            .aggregate(count=Count('activityjoined__activityreview'))['count']
+        count_pos += int(count_pos == 0)
+        calculate = average - (count_neg / count_pos)
+        return calculate >= 3.5
 
     def __str__(self):
         return self.name
