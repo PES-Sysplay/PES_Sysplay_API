@@ -155,7 +155,8 @@ class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(read_only=True)
     favorites = serializers.SerializerMethodField(read_only=True)
     joined = serializers.SerializerMethodField(read_only=True)
-    email_notifications = serializers.BooleanField()
+    email_notifications = serializers.BooleanField(write_only=True)
+    notifications = serializers.BooleanField(source='client.email', read_only=True)
 
     def get_favorites(self, user):
         return user.client.favoriteactivity_set.count()
@@ -164,14 +165,15 @@ class UserSerializer(serializers.ModelSerializer):
         return user.client.activityjoined_set.count()
 
     def update(self, instance, validated_data):
+        noty = validated_data.get('email_notifications', None)
         user = super().update(instance, validated_data)
-        user.client.email = validated_data.get('email_notifications')
+        user.client.email = noty
         user.client.save()
         return user
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'favorites', 'joined', 'email_notifications']
+        fields = ['email', 'username', 'favorites', 'joined', 'email_notifications', 'notifications']
 
 
 class ActionActivitySerializer(serializers.ModelSerializer):

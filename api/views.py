@@ -14,7 +14,7 @@ from activity.models import Activity, ActivityType, FavoriteActivity
 from activity_action.models import ActivityJoined, ActivityReport, ActivityReview
 from api.emails import send_email_verification, send_remainder_email
 from user.mixins import ClientPermission
-from user.models import Client
+from user.models import Client, Blocked
 
 from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, UserSerializer, \
     FavoriteActivitySerializer, ActivityJoinedSerializer, ReportActivitySerializer, ReviewActivitySerializer, \
@@ -35,6 +35,8 @@ class ActivityViewSet(ReadOnlyModelViewSet):
             queryset = queryset.filter(favoriteactivity__client_id=self.request.user.id)
         if self.request.GET.get('joined', False):
             queryset = queryset.filter(activityjoined__client_id=self.request.user.id)
+        blocked = Blocked.objects.filter(client_id=self.request.user.id).values_list('organization_id', flat=True)
+        queryset = queryset.exclude(organized_by__in=blocked)
         return queryset
 
 

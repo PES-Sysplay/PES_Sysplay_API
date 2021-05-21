@@ -4,6 +4,7 @@ from activity_action.models import ActivityJoined
 
 
 class CheckinTable(tables.Table):
+    block = tables.TemplateColumn(template_name='include/actions.html', verbose_name='Sistema de bloqueo')
 
     class Meta:
         model = ActivityJoined

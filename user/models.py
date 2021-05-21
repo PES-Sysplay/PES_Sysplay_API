@@ -50,3 +50,11 @@ class Client(models.Model):
         client = Client(user=user, is_verified=True)
         client.save()
         return client
+
+
+class Blocked(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('organization', 'client')
