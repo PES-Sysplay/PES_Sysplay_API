@@ -151,10 +151,11 @@ class ActivityTypeSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    email = serializers.CharField()
-    username = serializers.CharField()
-    favorites = serializers.SerializerMethodField()
-    joined = serializers.SerializerMethodField()
+    email = serializers.CharField(read_only=True)
+    username = serializers.CharField(read_only=True)
+    favorites = serializers.SerializerMethodField(read_only=True)
+    joined = serializers.SerializerMethodField(read_only=True)
+    email_notifications = serializers.BooleanField()
 
     def get_favorites(self, user):
         return user.client.favoriteactivity_set.count()
@@ -162,9 +163,15 @@ class UserSerializer(serializers.ModelSerializer):
     def get_joined(self, user):
         return user.client.activityjoined_set.count()
 
+    def update(self, instance, validated_data):
+        user = super().update(instance, validated_data)
+        user.client.email = validated_data.get('email_notifications')
+        user.client.save()
+        return user
+
     class Meta:
         model = User
-        fields = ['email', 'username', 'favorites', 'joined']
+        fields = ['email', 'username', 'favorites', 'joined', 'email_notifications']
 
 
 class ActionActivitySerializer(serializers.ModelSerializer):
@@ -224,3 +231,9 @@ class ReviewActivitySerializer(ActionActivitySerializer):
     class Meta:
         fields = ['activity_id', 'comment', 'joined_id', 'stars']
         model = ActivityReview
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ['email']
+        model = Client

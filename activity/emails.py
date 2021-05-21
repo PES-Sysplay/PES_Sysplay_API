@@ -12,12 +12,12 @@ def send_email_activity_changed(old, new):
         if old_field != new_field:
             changes[name] = (old_field, new_field)
     if changes:
-        emails = old.activityjoined_set.all().values_list('client__user__email', flat=True)
+        emails = old.activityjoined_set.filter(client__email=True).values_list('client__user__email', flat=True)
         context = {'changes': changes, 'activity': new}
         Email('activity_changed', context=context, list_mails=emails).send()
 
 
 def send_email_activity_cancelled(activity):
-    emails = activity.activityjoined_set.all().values_list('client__user__email', flat=True)
+    emails = activity.activityjoined_set.filter(client__email=True).values_list('client__user__email', flat=True)
     context = {'activity': activity}
     Email('activity_cancelled', context=context, list_mails=emails).send()

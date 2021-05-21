@@ -5,7 +5,7 @@ from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
-from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, ListModelMixin
+from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, ListModelMixin, UpdateModelMixin
 from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
@@ -17,7 +17,8 @@ from user.mixins import ClientPermission
 from user.models import Client
 
 from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, UserSerializer, \
-    FavoriteActivitySerializer, ActivityJoinedSerializer, ReportActivitySerializer, ReviewActivitySerializer
+    FavoriteActivitySerializer, ActivityJoinedSerializer, ReportActivitySerializer, ReviewActivitySerializer, \
+    ProfileSerializer
 from api.serializers import RegistrationSerializer
 from user.services import GoogleOauth
 
@@ -69,7 +70,7 @@ class ActivityTypeViewSet(ReadOnlyModelViewSet):
     permission_classes = [ClientPermission]
 
 
-class UserClientView(RetrieveDestroyAPIView):
+class UserClientView(UpdateModelMixin, RetrieveDestroyAPIView):
     queryset = Client.objects.all()
     serializer_class = UserSerializer
     model = User
@@ -81,6 +82,9 @@ class UserClientView(RetrieveDestroyAPIView):
             return Client.objects.get(user=self.request.user).user
         except Client.DoesNotExist:
             raise PermissionDenied()
+
+    def put(self, request):
+        return self.update(request)
 
 
 class ActionActivityView(DestroyModelMixin, CreateModelMixin, GenericViewSet):
@@ -156,3 +160,14 @@ class GoogleLoginView(APIView):
             client = Client.create_client_from_google(email=email)
         token = client.get_token()
         return JsonResponse({'token': token})
+
+
+class ProfileView(UpdateAPIView, APIView):
+    queryset = Client.objects.all()
+    serializer_class = ProfileSerializer
+    model = Client
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    permission_classes = [ClientPermission]
+
+    def get_object(self):
+        return self.request.user.client

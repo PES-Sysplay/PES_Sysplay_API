@@ -30,6 +30,7 @@ class Client(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     is_verified = models.BooleanField(default=False)
     token_verification = models.UUIDField(unique=True, default=uuid.uuid4)
+    email = models.BooleanField(default=True)
 
     def __str__(self):
         return self.user.username
