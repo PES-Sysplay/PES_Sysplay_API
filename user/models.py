@@ -68,5 +68,8 @@ class Blocked(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return '%s - %s' % (self.organization, self.client)
+
     class Meta:
         unique_together = ('organization', 'client')

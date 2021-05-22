@@ -29,6 +29,7 @@ urlpatterns = [
     path('user/', include('user.urls')),
     path('activity/action/', include('activity_action.urls')),
     path('', home, name='home'),
+    path('chat/', include('chat.urls')),
 ]
 
 if settings.DEBUG:

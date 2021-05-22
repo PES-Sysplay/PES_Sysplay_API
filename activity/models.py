@@ -17,7 +17,8 @@ class ActivityType(models.Model):
 class Activity(models.Model):
     STATUS_PENDING = 'P'
     STATUS_CANCELLED = 'C'
-    STATUS_CHOICES = [(STATUS_PENDING, 'Pendiente'), (STATUS_CANCELLED, 'Cancelada'), ('D', 'Finalizada')]
+    STATUS_ENDED = 'D'
+    STATUS_CHOICES = [(STATUS_PENDING, 'Pendiente'), (STATUS_CANCELLED, 'Cancelada'), (STATUS_ENDED, 'Finalizada')]
 
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=1000)
@@ -37,6 +38,13 @@ class Activity(models.Model):
 
     def __str__(self):
         return '%s - %s' % (self.organized_by_id, self.name)
+
+    @property
+    def start(self):
+        if self.status == self.STATUS_PENDING and datetime.combine(self.start_date, self.start_time) < datetime.now():
+            self.status = self.STATUS_ENDED
+            self.save()
+        return ""
 
     class Meta:
         verbose_name_plural = 'Activities'

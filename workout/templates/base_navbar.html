@@ -18,11 +18,16 @@
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
               <ul class="nav navbar-nav ms-auto">
                 {% if request.user.is_authenticated %}
+                    {% if request.user.is_staff %}
+                        <li class="nav-item">
+                      <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item">
-                      <a class="nav-link{% if 'activity/all' in request.build_absolute_uri %} active{% endif %}" href="{% url 'activity_list_view' %}">Mis eventos</a>
+                      <a class="nav-link{% if 'chat/' in request.build_absolute_uri %} active{% endif %}" href="{% url 'chat' %}">Chats{% if new_chats %} <span style="background-color: #374f87 !important;" class="badge bg-secondary">{{ new_chats }} Nuevo{% if new_chats > 1 %}s{% endif %}</span>{% endif %}</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link{% if 'activity/create' in request.build_absolute_uri %} active{% endif %}" href="{% url 'create_activity' %}">Nuevo evento</a>
+                      <a class="nav-link{% if 'activity/all' in request.build_absolute_uri %} active{% endif %}" href="{% url 'activity_list_view' %}">Mis eventos</a>
                     </li>
                     {% if request.user.organizer.admin %}
                         <li class="nav-item">
