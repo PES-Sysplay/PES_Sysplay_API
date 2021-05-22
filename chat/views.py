@@ -22,8 +22,8 @@ class ChatView(TemplateView):
         if search:
             chats = chats.filter(Q(activity__name__icontains=search) | Q(client__user__username__icontains=search))
         chats = list(chats)
-        chats.sort(key=lambda x: x.last_message.date.timestamp() +
-                   (datetime.now().timestamp() if x.last_message.user_id not in organization_ids else 0), reverse=True)
+        chats.sort(key=lambda x: x.last_message.date.timestamp() + (
+            datetime.now().timestamp() if x.last_message.user_id not in organization_ids else 0), reverse=True)
         context.update({
             'chats_list': chats,
             'search': search,

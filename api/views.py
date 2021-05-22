@@ -189,6 +189,3 @@ class MessageView(CreateModelMixin, GenericViewSet):
     models = Message
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
-
-
-
