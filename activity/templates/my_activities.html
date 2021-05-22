@@ -19,9 +19,9 @@
                         <div style="background-size: cover; background-repeat: no-repeat; background-image: url('{{ activity.photo.url }}'); background-position: center center; height: 300px">
                             <span style="margin-top: 10px; margin-left: 10px" class="badge bg-{% if activity.status == activity.STATUS_PENDING %}success{% elif activity.status == activity.STATUS_ENDED %}warning{% else %}danger{% endif %}">{{ activity.get_status_display }}</span>
                         </div>
-                        <div class="card-body" style="background: white">
+                        <div class="card-body" style="background: white; height: 110px">
                             <h5 class="card-title">{{ activity.name }} - {{ activity.start_date }}</h5>
-                            <p class="card-text">{{ activity.description|truncatechars:30 }}</p>
+                            <p class="card-text">{{ activity.description|truncatechars:50 }}</p>
                         </div>
                     </div>
                 </a>
