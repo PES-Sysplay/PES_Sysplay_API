@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'api',
     'user',
     'activity_action',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'workout.context_processors.get_chat_context_processor',
             ],
         },
     },

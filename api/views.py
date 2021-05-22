@@ -13,12 +13,13 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 from activity.models import Activity, ActivityType, FavoriteActivity
 from activity_action.models import ActivityJoined, ActivityReport, ActivityReview
 from api.emails import send_email_verification, send_remainder_email
+from chat.models import Chat, Message
 from user.mixins import ClientPermission
 from user.models import Client, Blocked
 
 from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, UserSerializer, \
     FavoriteActivitySerializer, ActivityJoinedSerializer, ReportActivitySerializer, ReviewActivitySerializer, \
-    ProfileSerializer
+    ChatSerializer, ChatSerializerExtended, MessageSerializer
 from api.serializers import RegistrationSerializer
 from user.services import GoogleOauth
 
@@ -164,12 +165,27 @@ class GoogleLoginView(APIView):
         return JsonResponse({'token': token})
 
 
-class ProfileView(UpdateAPIView, APIView):
-    queryset = Client.objects.all()
-    serializer_class = ProfileSerializer
-    model = Client
+class ChatView(ReadOnlyModelViewSet):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    models = Chat
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]
 
-    def get_object(self):
-        return self.request.user.client
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return ChatSerializerExtended
+        return super().get_serializer_class()
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(client_id=self.request.user.id)
+        return queryset
+
+
+class MessageView(CreateModelMixin, GenericViewSet):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    models = Message
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    permission_classes = [ClientPermission]

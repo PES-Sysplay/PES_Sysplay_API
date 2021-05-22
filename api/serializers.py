@@ -1,6 +1,7 @@
 import datetime
 
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -8,6 +9,7 @@ from rest_framework.authtoken.models import Token
 
 from activity.models import Activity, ActivityType, FavoriteActivity
 from activity_action.models import ActivityJoined, ActivityReport, ActivityReview
+from chat.models import Message, Chat
 
 from user.models import Client
 
@@ -239,7 +241,52 @@ class ReviewActivitySerializer(ActionActivitySerializer):
         model = ActivityReview
 
 
-class ProfileSerializer(serializers.ModelSerializer):
+class MessageSerializer(serializers.ModelSerializer):
+    date_timestamp = serializers.SerializerMethodField(read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    activity_id = serializers.IntegerField(write_only=True)
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        validated_data['user_id'] = request.user.id
+        activity_id = validated_data.get('activity_id', '')
+        if activity_id:
+            del validated_data['activity_id']
+        try:
+            chat = Chat.objects.get(client_id=request.user.id, activity_id=activity_id)
+        except Chat.DoesNotExist:
+            try:
+                chat = Chat(client_id=request.user.id, activity_id=activity_id)
+                chat.save()
+            except IntegrityError:
+                raise serializers.ValidationError('This activity does not exists')
+        validated_data['chat_id'] = chat.id
+        return super().create(validated_data)
+
+    def get_date_timestamp(self, message):
+        return message.date.timestamp()
+
     class Meta:
-        fields = ['email']
-        model = Client
+        fields = ['id', 'text', 'username', 'date_timestamp', 'activity_id']
+        model = Message
+
+
+class ChatSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='client.user.username', read_only=True)
+    activity_name = serializers.CharField(source='activity.name', read_only=True)
+    organization = serializers.CharField(source='activity.organized_by_id', read_only=True)
+    new = serializers.SerializerMethodField(read_only=True)
+
+    def get_new(self, chat):
+        return not hasattr(chat.last_message.user, 'client')
+
+    class Meta:
+        fields = ['username', 'activity_id', 'activity_name', 'organization', 'id', 'new']
+        model = Chat
+
+
+class ChatSerializerExtended(ChatSerializer):
+    messages = MessageSerializer(many=True, read_only=True)
+
+    class Meta(ChatSerializer.Meta):
+        fields = ['username', 'activity_id', 'activity_name', 'organization', 'id', 'new', 'messages']

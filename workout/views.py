@@ -3,4 +3,8 @@ from django.urls import reverse
 
 
 def home(request):
-    return redirect(reverse('create_activity'))
+    if request.user.organizer.admin:
+        name = 'manage'
+    else:
+        name = 'activity_list_view'
+    return redirect(reverse(name))

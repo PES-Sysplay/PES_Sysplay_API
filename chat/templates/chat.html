@@ -1,0 +1,85 @@
+{% extends 'base_navbar.html' %}
+{% block content %}
+        <div class="messaging">
+            <div class="inbox_msg">
+                <div class="inbox_people">
+                    <div class="headind_srch">
+                        <div class="recent_heading">
+                            <h4>Chats</h4>
+                        </div>
+                        <form method="get">
+                            <div class="srch_bar">
+                                <div class="stylish-input-group">
+                                    <input type="text" class="search-bar" placeholder="Buscar" autocomplete="off" name="search" value="{{ search }}">
+                                    <span class="input-group-addon">
+                                        <button type="submit"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="inbox_chat">
+                        {% for chat in chats_list %}
+                            <a href="{% url 'chat_individual' chat.id %}">
+                                <div class="chat_list {% if actual_chat.id == chat.id %}active_chat{% endif %}">
+                                    <div class="chat_people">
+                                        <div class="row">
+                                            <div class="col-10">
+                                                <p style="color: black;{% if chat.last_message.user_id not in organization_ids %}font-weight: bold{% endif %}">{{ chat.activity.name }} - {{ chat.activity.start_date }}<br> {{ chat.client.user.username }}</p>
+                                            </div>
+                                            <div class="col-2">
+                                                <p style="color: black; text-align: right">{{ chat.last_message.day }}</p>
+                                            </div>
+                                            <div class="col-12">
+                                                <p>{{ chat.last_message.text|truncatechars:50 }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if actual_chat %}
+                    <div class="mesgs">
+                        <div class="msg_history" id="message_history">
+                            {% for message in actual_chat.messages.all %}
+                                <div class="{% if message.user.id not in organization_ids %}incoming_msg{% else %}outgoing_msg{% endif %}">
+                                    <div class="{% if message.user.id not in organization_ids %}received_withd_msg{% else %}sent_msg{% endif %}">
+                                        <p>{{ message.text }}</p>
+                                        <span class="time_date"> {{ message.hour }}    |    {{ message.day }}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="type_msg">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="input_msg_write">
+                                    <input type="text" class="write_msg" placeholder="Escribe un mensaje" autocomplete="off" name="message" id="input_message"/>
+                                    <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o"
+                                                                                  aria-hidden="true"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="mesgs">
+                        <p style="text-align: center; color: #989898;">Selecciona un chat para contestar las dudas de tus clientes</p>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    <script>
+        function auto_scroll() {
+            let scroll = document.getElementById("message_history");
+            if (scroll != null) scroll.scrollTop = scroll.scrollHeight;
+            let input = document.getElementById("input_message");
+            if (input != null) input.focus();
+        }
+
+        auto_scroll()
+    </script>
+{% endblock %}
