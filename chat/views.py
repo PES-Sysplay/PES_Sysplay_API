@@ -8,9 +8,10 @@ from django.urls import reverse
 from django.views.generic import TemplateView
 
 from chat.models import Chat, Message
+from user.mixins import OrganizerPermission
 
 
-class ChatView(TemplateView):
+class ChatView(OrganizerPermission, TemplateView):
     template_name = 'chat.html'
 
     def get_context_data(self, **kwargs):

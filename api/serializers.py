@@ -11,7 +11,7 @@ from activity.models import Activity, ActivityType, FavoriteActivity
 from activity_action.models import ActivityJoined, ActivityReport, ActivityReview
 from chat.models import Message, Chat
 
-from user.models import Client
+from user.models import Client, Organization
 
 
 class ActivitySerializer(serializers.HyperlinkedModelSerializer):
@@ -275,13 +275,19 @@ class ChatSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='client.user.username', read_only=True)
     activity_name = serializers.CharField(source='activity.name', read_only=True)
     organization = serializers.CharField(source='activity.organized_by_id', read_only=True)
+    organization_photo = serializers.SerializerMethodField(read_only=True)
     new = serializers.SerializerMethodField(read_only=True)
+
+    def get_organization_photo(self, chat):
+        request = self.context.get('request')
+        photo_url = chat.activity.organized_by.photo.url
+        return request.build_absolute_uri(photo_url)
 
     def get_new(self, chat):
         return not hasattr(chat.last_message.user, 'client')
 
     class Meta:
-        fields = ['username', 'activity_id', 'activity_name', 'organization', 'id', 'new']
+        fields = ['username', 'activity_id', 'activity_name', 'organization', 'id', 'new', 'organization_photo']
         model = Chat
 
 
@@ -289,4 +295,26 @@ class ChatSerializerExtended(ChatSerializer):
     messages = MessageSerializer(many=True, read_only=True)
 
     class Meta(ChatSerializer.Meta):
-        fields = ['username', 'activity_id', 'activity_name', 'organization', 'id', 'new', 'messages']
+        fields = ['username', 'activity_id', 'activity_name', 'organization', 'id', 'new', 'organization_photo',
+                  'messages']
+
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    photo = serializers.SerializerMethodField(read_only=True)
+    rank = serializers.SerializerMethodField(read_only=True)
+    superhost = serializers.SerializerMethodField(read_only=True)
+
+    def get_photo(self, organization):
+        request = self.context.get('request')
+        photo_url = organization.photo.url
+        return request.build_absolute_uri(photo_url)
+
+    def get_rank(self, organization):
+        return organization.rank
+
+    def get_superhost(self, organization):
+        return organization.superhost
+
+    class Meta:
+        model = Organization
+        fields = ['name', 'photo', 'rank', 'superhost']
