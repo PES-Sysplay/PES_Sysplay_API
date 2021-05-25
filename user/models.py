@@ -14,16 +14,25 @@ class Organization(models.Model):
     photo = models.FileField(validators=[validate_file_extension], upload_to="user", null=True)
 
     @property
-    def superhost(self):
+    def rank(self):
         average = self.activity_set.values('organized_by').aggregate(
-            average=Avg('activityjoined__activityreview__stars'))['average']
+            average=Avg('activityjoined__activityreview__stars')).get('average', 0)
         count_neg = self.activity_set.values('organized_by').aggregate(
-            count=Count('activityjoined__activityreport'))['count']
+            count=Count('activityjoined__activityreport')).get('count', 0)
         count_pos = self.activity_set.values('organized_by').filter(activityjoined__activityreview__stars__gte=4) \
-            .aggregate(count=Count('activityjoined__activityreview'))['count']
+            .aggregate(count=Count('activityjoined__activityreview')).get('count', 1)
+        if average is None:
+            average = 0
+        if count_pos is None:
+            count_pos = 1
+        if count_neg is None:
+            count_neg = 0
         count_pos += int(count_pos == 0)
-        calculate = average - (count_neg / count_pos)
-        return calculate >= 3.5
+        return average - (count_neg / count_pos)
+
+    @property
+    def superhost(self):
+        return self.rank >= 3.5
 
     def __str__(self):
         return self.name

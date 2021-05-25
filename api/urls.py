@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from api.views import ActivityViewSet, ClientViewSet, ChangePasswordView, ActivityTypeViewSet, UserClientView, \
     FavoriteActivityView, JoinActivityView, ReportActivityView, ReviewActivityView, GoogleLoginView, ChatView, \
-    MessageView
+    MessageView, OrganizationView
 
 from rest_framework.authtoken import views
 
@@ -17,6 +17,7 @@ router.register(r'report', ReportActivityView)
 router.register(r'review', ReviewActivityView)
 router.register(r'chat', ChatView)
 router.register(r'message', MessageView)
+router.register(r'organization', OrganizationView)
 
 urlpatterns = [
     path('', include(router.urls)),
