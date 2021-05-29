@@ -33,8 +33,19 @@ class ActivityReport(models.Model):
 
 class ActivityReview(models.Model):
     joined = models.OneToOneField(ActivityJoined, on_delete=models.CASCADE, primary_key=True)
-    comment = models.CharField(max_length=1000, blank=True)
-    stars = models.FloatField(validators=[MaxValueValidator(5), MinValueValidator(0)])
+    comment = models.CharField(max_length=1000, blank=True, verbose_name='commentarios')
+    stars = models.FloatField(validators=[MaxValueValidator(5), MinValueValidator(0)], verbose_name='puntuación')
 
     def __str__(self):
         return str(self.joined)
+
+
+class ReportActivityReview(models.Model):
+    review = models.ForeignKey(ActivityReview, on_delete=models.CASCADE, related_name='reports')
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.client) + ' - ' + str(self.review)
+
+    class Meta:
+        unique_together = ('review', 'client')

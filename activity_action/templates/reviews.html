@@ -11,22 +11,18 @@
 {% block content %}
     <div class="row justify-content-md-center main-form">
         <div class="col-11">
-            <h2 class="text-center margin-top">Check-in</h2>
+            <h2 class="text-center margin-top">Reviews</h2>
             {% include 'include/messages.html' %}
-            <div class="row">
-                <form id="checkin-search" method="post" class="form text-left filter">
-                    {% csrf_token %}
-                    {% include 'include/input.html' with type='qr' desc='Search' name='token' id='id_search' %}
-                </form>
-            </div>
             <div class="row">
                 {% render_table table 'django_tables2/bootstrap-responsive.html' %}
             </div>
+            <div class="row justify-content-center">
+                <div class="d-grid gap-2 col-3 mx-auto">
+                    <a class="btn btn-block btn-secondary" href="{% url 'activity_list_view' %}">< Volver</a>
+                </div>
 
+            </div>
 
         </div>
     </div>
-    <script>
-
-    </script>
 {% endblock %}

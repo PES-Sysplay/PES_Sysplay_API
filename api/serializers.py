@@ -8,7 +8,7 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 from activity.models import Activity, ActivityType, FavoriteActivity
-from activity_action.models import ActivityJoined, ActivityReport, ActivityReview
+from activity_action.models import ActivityJoined, ActivityReport, ActivityReview, ReportActivityReview
 from chat.models import Message, Chat
 
 from user.models import Client, Organization
@@ -236,8 +236,14 @@ class ReportActivitySerializer(ActionActivitySerializer):
 
 
 class ReviewActivitySerializer(ActionActivitySerializer):
+    reported = serializers.SerializerMethodField(read_only=True)
+
+    def get_reported(self, review):
+        request = self.context.get('request')
+        return review.reports.filter(client_id=request.user.id).exists()
+
     class Meta:
-        fields = ['activity_id', 'comment', 'joined_id', 'stars']
+        fields = ['activity_id', 'comment', 'joined_id', 'stars', 'reported']
         model = ActivityReview
 
 
@@ -277,17 +283,22 @@ class ChatSerializer(serializers.ModelSerializer):
     organization = serializers.CharField(source='activity.organized_by_id', read_only=True)
     organization_photo = serializers.SerializerMethodField(read_only=True)
     new = serializers.SerializerMethodField(read_only=True)
+    last_message = serializers.SerializerMethodField(read_only=True)
 
     def get_organization_photo(self, chat):
         request = self.context.get('request')
         photo_url = chat.activity.organized_by.photo.url
         return request.build_absolute_uri(photo_url)
 
+    def get_last_message(self, chat):
+        return MessageSerializer(chat.last_message, context=self.context).data
+
     def get_new(self, chat):
         return not hasattr(chat.last_message.user, 'client')
 
     class Meta:
-        fields = ['username', 'activity_id', 'activity_name', 'organization', 'id', 'new', 'organization_photo']
+        fields = ['username', 'activity_id', 'activity_name', 'organization', 'id', 'new', 'organization_photo',
+                  'last_message']
         model = Chat
 
 
@@ -318,3 +329,23 @@ class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
         fields = ['name', 'photo', 'rank', 'superhost']
+
+
+class ReportActivityReviewSerializer(serializers.ModelSerializer):
+    review_id = serializers.IntegerField()
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        review_id = validated_data.get('review_id', 0)
+        try:
+            ReportActivityReview.objects.get(client_id=request.user.id, review_id=review_id)
+            raise serializers.ValidationError('Already reported')
+        except ReportActivityReview.DoesNotExist:
+            pass
+        get_object_or_404(ActivityReview, pk=review_id)
+        validated_data['client_id'] = request.user.id
+        return super().create(validated_data)
+
+    class Meta:
+        model = ReportActivityReview
+        fields = ['review_id']
