@@ -163,4 +163,3 @@ class RankingView(OrganizerPermission, SingleTableView):
         queryset = list(super().get_queryset())
         queryset.sort(key=lambda x: -x.rank)
         return queryset
-
