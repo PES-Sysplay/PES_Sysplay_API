@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from activity.models import Activity, ActivityType, FavoriteActivity
-from activity_action.models import ActivityJoined, ActivityReport, ActivityReview
+from activity_action.models import ActivityJoined, ActivityReport, ActivityReview, ReportActivityReview
 from api.emails import send_email_verification, send_remainder_email
 from chat.models import Chat, Message
 from user.mixins import ClientPermission
@@ -19,7 +19,7 @@ from user.models import Client, Blocked, Organization
 
 from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, UserSerializer, \
     FavoriteActivitySerializer, ActivityJoinedSerializer, ReportActivitySerializer, ReviewActivitySerializer, \
-    ChatSerializer, ChatSerializerExtended, MessageSerializer, OrganizationSerializer
+    ChatSerializer, ChatSerializerExtended, MessageSerializer, OrganizationSerializer, ReportActivityReviewSerializer
 from api.serializers import RegistrationSerializer
 from user.services import GoogleOauth
 
@@ -195,5 +195,13 @@ class OrganizationView(ListModelMixin, GenericViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
     models = Organization
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    permission_classes = [ClientPermission]
+
+
+class ReportActivityReviewView(CreateModelMixin, GenericViewSet):
+    queryset = ReportActivityReview.objects.all()
+    serializer_class = ReportActivityReviewSerializer
+    models = ReportActivityReview
     authentication_classes = (TokenAuthentication, SessionAuthentication)
     permission_classes = [ClientPermission]

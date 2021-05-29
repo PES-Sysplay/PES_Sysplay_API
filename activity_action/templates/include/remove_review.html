@@ -1,0 +1,5 @@
+{% if record.comment != '' and record.reports.all.count > 5 %}
+    <a href="{% url 'remove-review' record.joined_id %}" class="btn btn-block btn-danger" onclick="return confirm('Confirma borrar esta valoración?')">Borrar</a>
+{% else %}
+    <button class="btn btn-block btn-danger" disabled>Borrar</button>
+{% endif %}

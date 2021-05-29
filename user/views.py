@@ -11,8 +11,8 @@ from django_tables2 import SingleTableView
 from user.emails import send_email_invitation
 from user.forms import LoginForm, RegisterForm, ImageForm, ChangePasswordForm
 from user.mixins import OrganizerAdminPermission, OrganizerPermission
-from user.models import Organizer, Client
-from user.tables import OrganizerTable
+from user.models import Organizer, Client, Organization
+from user.tables import OrganizerTable, OrganizationTable
 
 
 def login(request):
@@ -152,3 +152,14 @@ class ChangePassword(OrganizerPermission, TemplateView):
         context = self.get_context_data()
         context.update({'form': form})
         return render(request, self.template_name, context)
+
+
+class RankingView(OrganizerPermission, SingleTableView):
+    model = Organization
+    table_class = OrganizationTable
+    template_name = 'ranking.html'
+
+    def get_queryset(self):
+        queryset = list(super().get_queryset())
+        queryset.sort(key=lambda x: -x.rank)
+        return queryset
