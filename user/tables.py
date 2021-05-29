@@ -14,8 +14,8 @@ class OrganizerTable(tables.Table):
 
 
 class OrganizationTable(tables.Table):
-    name = tables.Column(orderable=False)
-    rank = tables.Column(orderable=False)
+    name = tables.Column(orderable=False, verbose_name='Organización')
+    rank = tables.Column(orderable=False, verbose_name='Puntuación')
     superhost = tables.Column(orderable=False)
 
     class Meta:
