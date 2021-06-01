@@ -35,7 +35,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         request = self.context.get('request')
         try:
             return activity.activityjoined_set.get(client_id=request.user.id).activityreview is not None
-        except ActivityJoined.DoesNotExist:
+        except (ActivityJoined.DoesNotExist, ActivityReview.DoesNotExist):
             return False
 
     def get_token(self, activity):
