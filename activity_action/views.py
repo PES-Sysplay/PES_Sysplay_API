@@ -83,7 +83,7 @@ class ReviewsView(OrganizerActivityPermission, SingleTableView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset.filter(joined__activity__organized_by_id=self.request.user.organizer.organization_id)
+        queryset = queryset.filter(joined__activity_id=self.kwargs.get('id', 0))
         return queryset
 
 
