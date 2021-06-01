@@ -18,7 +18,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from workout.views import home
+from workout.views import Home
 
 
 urlpatterns = [
@@ -28,7 +28,8 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('user/', include('user.urls')),
     path('activity/action/', include('activity_action.urls')),
-    path('', home, name='home'),
+    path('', Home.as_view(), name='home'),
+    path('chat/', include('chat.urls')),
 ]
 
 if settings.DEBUG:

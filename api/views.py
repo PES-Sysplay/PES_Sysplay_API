@@ -5,19 +5,21 @@ from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
-from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, ListModelMixin
+from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, ListModelMixin, UpdateModelMixin
 from rest_framework.generics import UpdateAPIView, RetrieveDestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
 from activity.models import Activity, ActivityType, FavoriteActivity
-from activity_action.models import ActivityJoined, ActivityReport, ActivityReview
+from activity_action.models import ActivityJoined, ActivityReport, ActivityReview, ReportActivityReview
 from api.emails import send_email_verification, send_remainder_email
+from chat.models import Chat, Message
 from user.mixins import ClientPermission
-from user.models import Client
+from user.models import Client, Blocked, Organization
 
 from api.serializers import ActivitySerializer, ChangePasswordSerializer, ActivityTypeSerializer, UserSerializer, \
-    FavoriteActivitySerializer, ActivityJoinedSerializer, ReportActivitySerializer, ReviewActivitySerializer
+    FavoriteActivitySerializer, ActivityJoinedSerializer, ReportActivitySerializer, ReviewActivitySerializer, \
+    ChatSerializer, ChatSerializerExtended, MessageSerializer, OrganizationSerializer, ReportActivityReviewSerializer
 from api.serializers import RegistrationSerializer
 from user.services import GoogleOauth
 
@@ -34,6 +36,8 @@ class ActivityViewSet(ReadOnlyModelViewSet):
             queryset = queryset.filter(favoriteactivity__client_id=self.request.user.id)
         if self.request.GET.get('joined', False):
             queryset = queryset.filter(activityjoined__client_id=self.request.user.id)
+        blocked = Blocked.objects.filter(client_id=self.request.user.id).values_list('organization_id', flat=True)
+        queryset = queryset.exclude(organized_by__in=blocked)
         return queryset
 
 
@@ -69,7 +73,7 @@ class ActivityTypeViewSet(ReadOnlyModelViewSet):
     permission_classes = [ClientPermission]
 
 
-class UserClientView(RetrieveDestroyAPIView):
+class UserClientView(UpdateModelMixin, RetrieveDestroyAPIView):
     queryset = Client.objects.all()
     serializer_class = UserSerializer
     model = User
@@ -81,6 +85,9 @@ class UserClientView(RetrieveDestroyAPIView):
             return Client.objects.get(user=self.request.user).user
         except Client.DoesNotExist:
             raise PermissionDenied()
+
+    def put(self, request):
+        return self.update(request)
 
 
 class ActionActivityView(DestroyModelMixin, CreateModelMixin, GenericViewSet):
@@ -156,3 +163,45 @@ class GoogleLoginView(APIView):
             client = Client.create_client_from_google(email=email)
         token = client.get_token()
         return JsonResponse({'token': token})
+
+
+class ChatView(ReadOnlyModelViewSet):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    models = Chat
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    permission_classes = [ClientPermission]
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return ChatSerializerExtended
+        return super().get_serializer_class()
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(client_id=self.request.user.id)
+        return queryset
+
+
+class MessageView(CreateModelMixin, GenericViewSet):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    models = Message
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    permission_classes = [ClientPermission]
+
+
+class OrganizationView(ListModelMixin, GenericViewSet):
+    queryset = Organization.objects.all()
+    serializer_class = OrganizationSerializer
+    models = Organization
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    permission_classes = [ClientPermission]
+
+
+class ReportActivityReviewView(CreateModelMixin, GenericViewSet):
+    queryset = ReportActivityReview.objects.all()
+    serializer_class = ReportActivityReviewSerializer
+    models = ReportActivityReview
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    permission_classes = [ClientPermission]

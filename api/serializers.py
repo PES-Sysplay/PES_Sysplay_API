@@ -1,15 +1,17 @@
 import datetime
 
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 from activity.models import Activity, ActivityType, FavoriteActivity
-from activity_action.models import ActivityJoined, ActivityReport, ActivityReview
+from activity_action.models import ActivityJoined, ActivityReport, ActivityReview, ReportActivityReview
+from chat.models import Message, Chat
 
-from user.models import Client
+from user.models import Client, Organization
 
 
 class ActivitySerializer(serializers.HyperlinkedModelSerializer):
@@ -26,6 +28,15 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     checked_in = serializers.SerializerMethodField()
     reported = serializers.SerializerMethodField()
     token = serializers.SerializerMethodField()
+    superhost = serializers.SerializerMethodField()
+    reviewed = serializers.SerializerMethodField()
+
+    def get_reviewed(self, activity):
+        request = self.context.get('request')
+        try:
+            return activity.activityjoined_set.get(client_id=request.user.id).activityreview is not None
+        except (ActivityJoined.DoesNotExist, ActivityReview.DoesNotExist):
+            return False
 
     def get_token(self, activity):
         request = self.context.get('request')
@@ -86,12 +97,15 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
             return ActivityReport.objects.filter(joined=joined[0].id).exists()
         return False
 
+    def get_superhost(self, activity):
+        return activity.organized_by.superhost
+
     class Meta:
         model = Activity
         fields = ['id', 'name', 'description', 'photo_url', 'activity_type_id', 'date_time', 'duration',
                   'normal_price', 'member_price', 'number_participants', 'status', 'location', 'only_member',
                   'organization', 'created', 'timestamp', 'favorite', 'joined', 'clients_joined', 'checked_in',
-                  'reported', 'token', 'date_time_finish']
+                  'reported', 'token', 'date_time_finish', 'superhost', 'reviewed']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -151,20 +165,29 @@ class ActivityTypeSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    email = serializers.CharField()
-    username = serializers.CharField()
-    favorites = serializers.SerializerMethodField()
-    joined = serializers.SerializerMethodField()
+    email = serializers.CharField(read_only=True)
+    username = serializers.CharField(read_only=True)
+    favorites = serializers.SerializerMethodField(read_only=True)
+    joined = serializers.SerializerMethodField(read_only=True)
+    email_notifications = serializers.BooleanField(write_only=True)
+    notifications = serializers.BooleanField(source='client.email', read_only=True)
 
     def get_favorites(self, user):
-        return user.client.favoriteactivity_set.count()
+        return user.client.favoriteactivity_set.filter(activity__status=Activity.STATUS_PENDING).count()
 
     def get_joined(self, user):
         return user.client.activityjoined_set.count()
 
+    def update(self, instance, validated_data):
+        noty = validated_data.get('email_notifications', None)
+        user = super().update(instance, validated_data)
+        user.client.email = noty
+        user.client.save()
+        return user
+
     class Meta:
         model = User
-        fields = ['email', 'username', 'favorites', 'joined']
+        fields = ['email', 'username', 'favorites', 'joined', 'email_notifications', 'notifications']
 
 
 class ActionActivitySerializer(serializers.ModelSerializer):
@@ -221,6 +244,121 @@ class ReportActivitySerializer(ActionActivitySerializer):
 
 
 class ReviewActivitySerializer(ActionActivitySerializer):
+    reported = serializers.SerializerMethodField(read_only=True)
+    username = serializers.SerializerMethodField(read_only=True)
+    id = serializers.IntegerField(read_only=True, source='pk')
+
+    def get_username(self, review):
+        return review.joined.client.user.username
+
+    def get_reported(self, review):
+        request = self.context.get('request')
+        return review.reports.filter(client_id=request.user.id).exists()
+
     class Meta:
-        fields = ['activity_id', 'comment', 'joined_id', 'stars']
+        fields = ['id', 'username', 'activity_id', 'comment', 'joined_id', 'stars', 'reported']
         model = ActivityReview
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    date_timestamp = serializers.SerializerMethodField(read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    activity_id = serializers.IntegerField(write_only=True)
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        validated_data['user_id'] = request.user.id
+        activity_id = validated_data.get('activity_id', '')
+        if activity_id:
+            del validated_data['activity_id']
+        try:
+            chat = Chat.objects.get(client_id=request.user.id, activity_id=activity_id)
+        except Chat.DoesNotExist:
+            try:
+                chat = Chat(client_id=request.user.id, activity_id=activity_id)
+                chat.save()
+            except IntegrityError:
+                raise serializers.ValidationError('This activity does not exists')
+        validated_data['chat_id'] = chat.id
+        return super().create(validated_data)
+
+    def get_date_timestamp(self, message):
+        return message.date.timestamp()
+
+    class Meta:
+        fields = ['id', 'text', 'username', 'date_timestamp', 'activity_id']
+        model = Message
+
+
+class ChatSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='client.user.username', read_only=True)
+    activity_name = serializers.CharField(source='activity.name', read_only=True)
+    organization = serializers.CharField(source='activity.organized_by_id', read_only=True)
+    organization_photo = serializers.SerializerMethodField(read_only=True)
+    new = serializers.SerializerMethodField(read_only=True)
+    last_message = serializers.SerializerMethodField(read_only=True)
+
+    def get_organization_photo(self, chat):
+        request = self.context.get('request')
+        photo_url = chat.activity.organized_by.photo.url
+        return request.build_absolute_uri(photo_url)
+
+    def get_last_message(self, chat):
+        return MessageSerializer(chat.last_message, context=self.context).data
+
+    def get_new(self, chat):
+        return not hasattr(chat.last_message.user, 'client')
+
+    class Meta:
+        fields = ['username', 'activity_id', 'activity_name', 'organization', 'id', 'new', 'organization_photo',
+                  'last_message']
+        model = Chat
+
+
+class ChatSerializerExtended(ChatSerializer):
+    messages = MessageSerializer(many=True, read_only=True)
+
+    class Meta(ChatSerializer.Meta):
+        fields = ['username', 'activity_id', 'activity_name', 'organization', 'id', 'new', 'organization_photo',
+                  'messages']
+
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    photo = serializers.SerializerMethodField(read_only=True)
+    rank = serializers.SerializerMethodField(read_only=True)
+    superhost = serializers.SerializerMethodField(read_only=True)
+
+    def get_photo(self, organization):
+        request = self.context.get('request')
+        photo_url = organization.photo.url
+        return request.build_absolute_uri(photo_url)
+
+    def get_rank(self, organization):
+        return organization.rank
+
+    def get_superhost(self, organization):
+        return organization.superhost
+
+    class Meta:
+        model = Organization
+        fields = ['name', 'photo', 'rank', 'superhost']
+
+
+class ReportActivityReviewSerializer(serializers.ModelSerializer):
+    review_id = serializers.IntegerField()
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        review_id = validated_data.get('review_id', 0)
+        try:
+            ReportActivityReview.objects.get(client_id=request.user.id, review_id=review_id)
+            raise serializers.ValidationError('Already reported')
+        except ReportActivityReview.DoesNotExist:
+            pass
+        get_object_or_404(ActivityReview, pk=review_id)
+        validated_data['client_id'] = request.user.id
+        return super().create(validated_data)
+
+    class Meta:
+        model = ReportActivityReview
+        fields = ['review_id']

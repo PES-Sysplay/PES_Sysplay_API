@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from activity_action.models import ActivityJoined, ActivityReport, ActivityReview
+from activity_action.models import ActivityJoined, ActivityReport, ActivityReview, ReportActivityReview
 
 
 @admin.register(ActivityJoined)
@@ -15,4 +15,9 @@ class ActivityReportAdmin(admin.ModelAdmin):
 
 @admin.register(ActivityReview)
 class ActivityReviewAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ReportActivityReview)
+class ReportActivityReviewAdmin(admin.ModelAdmin):
     pass

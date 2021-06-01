@@ -1,24 +1,40 @@
 {% extends "base_navbar.html" %}
 {% block content %}
-<div class="row row-cols-1 row-cols-md-3 g-4">
-    {% for activity in activities %}
-        {% if not forloop.first and forloop.counter0|divisibleby:3 %}
-            </div>
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% endif %}
-        <div class="col">
-            <a href="{% url 'view_activity' activity.id %}">
-                <div class="card" >
-                    <div style="background-size: cover; background-repeat: no-repeat; background-image: url('{{ activity.photo.url }}'); background-position: center center; height: 300px">
-                        <span style="margin-top: 10px; margin-left: 10px" class="badge bg-{% if activity.status == 'P' %}success{% else %}danger{% endif %}">{{ activity.get_status_display }}</span>
-                    </div>
-                    <div class="card-body" style="background: white">
-                        <h5 class="card-title">{{ activity.name }} - {{ activity.start_date }}</h5>
-                        <p class="card-text">{{ activity.description|truncatechars:30 }}</p>
-                    </div>
-                </div>
-            </a>
+    <div class="row">
+        <div class="col-sm-10"></div>
+        <div class="col-sm-2">
+            <a class="btn btn-primary btn-block" href="{% url 'create_activity' %}">Nueva activiadad</a>
         </div>
-    {% endfor %}
-</div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-3 g-4 margin-top">
+        {% for activity in activities %}
+            {% if not forloop.first and forloop.counter0|divisibleby:3 %}
+                </div>
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% endif %}
+            <div class="col">
+
+                    <div class="card" >
+                        {{ activity.start }}
+                        <div style="background-size: cover; background-repeat: no-repeat; background-image: url('{{ activity.photo.url }}'); background-position: center center; height: 300px">
+                            <div class="row">
+                                <div class="col-9">
+                                    <span style="margin-top: 10px; margin-left: 10px" class="badge bg-{% if activity.status == activity.STATUS_PENDING %}success{% elif activity.status == activity.STATUS_ENDED %}warning{% else %}danger{% endif %}">{{ activity.get_status_display }}</span>
+                                </div>
+                                <div class="col-3">
+                                    <a href="{% url 'reviews' activity.id %}"><span style="margin-top: 10px" class="badge bg-info">Reviews</span></a>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{% url 'view_activity' activity.id %}">
+                            <div class="card-body" style="background: white; height: 120px">
+                                <h5 class="card-title">{{ activity.name }}<br>{{ activity.start_date }}</h5>
+                                <p class="card-text">{{ activity.description|truncatechars:50 }}</p>
+                            </div>
+                        </a>
+                    </div>
+
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

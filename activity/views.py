@@ -68,7 +68,7 @@ class ActivityListView(OrganizerPermission, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         organizer = get_object_or_404(Organizer, user=self.request.user)
-        activities = Activity.objects.filter(organized_by=organizer.organization).order_by('start_date')
+        activities = Activity.objects.filter(organized_by=organizer.organization).order_by('-start_date')
         context.update({'activities': activities})
         return context
 

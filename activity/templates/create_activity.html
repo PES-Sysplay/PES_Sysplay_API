@@ -15,22 +15,39 @@
                     {% endfor %}
                     </ul>
                 {% endif %}
-                {% if form.instance.status != 'C' %}
                     <div class="row justify-content-center">
                         <div class="d-grid gap-2 col-3 mx-auto">
-                            <a href="{% url "checkin-list" form.instance.pk %}" class="btn btn-block btn-primary">Checkin</a>
+                            <a href="{% url "activity_list_view" %}" class="btn btn-block btn-secondary">< Volver</a>
+                        </div>
+                        {% if form.instance.status != form.instance.STATUS_CANCELLED %}
+                            <div class="d-grid gap-2 col-3 mx-auto">
+                                <a href="{% url "checkin-list" form.instance.pk %}" class="btn btn-block btn-primary">Checkin</a>
+                            </div>
+                            {% if form.instance.status == form.instance.STATUS_PENDING %}
+                                <div class="d-grid gap-2 col-3 mx-auto">
+                                    <a href="{% url "edit_activity" form.instance.pk %}" class="btn btn-block btn-primary">Editar Actividad</a>
+                                </div>
+                                <div class="d-grid gap-2 col-3 mx-auto">
+                                    <a href="{% url "cancel_activity" form.instance.pk %}" onclick="return confirm('Confirmas cancelar la actividad?')" class="btn btn-block btn-danger">Cancelar Actividad</a>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
+                    </div>
+            {% else %}
+                <div class="row justify-content-center">
+                        <div class="d-grid gap-2 col-3 mx-auto">
+                            <button class="btn btn-block btn-secondary" onclick="window.history.back();">< Volver</button>
                         </div>
                         <div class="d-grid gap-2 col-3 mx-auto">
-                            <a href="{% url "edit_activity" form.instance.pk %}" class="btn btn-block btn-primary">Editar Actividad</a>
+                            <button type="submit" class="btn btn-block btn-success">Guardar Actividad!</button>
                         </div>
                         <div class="d-grid gap-2 col-3 mx-auto">
-                            <a href="{% url "cancel_activity" form.instance.pk %}" onclick="return confirm('Confirmas cancelar la actividad?')" class="btn btn-block btn-danger">Cancelar Actividad</a>
+                            <a class="btn btn-block btn-secondary" target="_blank" href="https://web.gencat.cat/ca/activem/restriccions-territorials/catalunya/">Consultar Restricciones</a>
                         </div>
 
                     </div>
-                {% endif %}
-            {% else %}
-                <button type="submit" class="button btn btn-block btn-success">Guardar Actividad!</button>
+
             {% endif %}
             </form>
         </div>
