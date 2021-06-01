@@ -173,7 +173,7 @@ class UserSerializer(serializers.ModelSerializer):
     notifications = serializers.BooleanField(source='client.email', read_only=True)
 
     def get_favorites(self, user):
-        return user.client.favoriteactivity_set.count()
+        return user.client.favoriteactivity_set.filter(activity__status=Activity.STATUS_PENDING).count()
 
     def get_joined(self, user):
         return user.client.activityjoined_set.count()
