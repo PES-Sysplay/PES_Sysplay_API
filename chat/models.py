@@ -33,9 +33,9 @@ class Message(models.Model):
 
     @property
     def day(self):
-        if self.date.today():
+        if self.date.date() == datetime.today().date():
             return 'Hoy'
-        elif self.date.date() + timedelta(days=1) > datetime.today():
+        elif self.date.date() + timedelta(days=1) > datetime.today().date():
             return 'Ayer'
         return self.date.strftime('%-d %b')
 
