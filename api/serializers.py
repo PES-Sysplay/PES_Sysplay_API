@@ -29,6 +29,14 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
     reported = serializers.SerializerMethodField()
     token = serializers.SerializerMethodField()
     superhost = serializers.SerializerMethodField()
+    reviewed = serializers.SerializerMethodField()
+
+    def get_reviewed(self, activity):
+        request = self.context.get('request')
+        try:
+            return activity.activityjoined_set.get(client_id=request.user.id).activityreview is not None
+        except ActivityJoined.DoesNotExist:
+            return False
 
     def get_token(self, activity):
         request = self.context.get('request')
@@ -97,7 +105,7 @@ class ActivitySerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'name', 'description', 'photo_url', 'activity_type_id', 'date_time', 'duration',
                   'normal_price', 'member_price', 'number_participants', 'status', 'location', 'only_member',
                   'organization', 'created', 'timestamp', 'favorite', 'joined', 'clients_joined', 'checked_in',
-                  'reported', 'token', 'date_time_finish', 'superhost']
+                  'reported', 'token', 'date_time_finish', 'superhost', 'reviewed']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -237,13 +245,18 @@ class ReportActivitySerializer(ActionActivitySerializer):
 
 class ReviewActivitySerializer(ActionActivitySerializer):
     reported = serializers.SerializerMethodField(read_only=True)
+    username = serializers.SerializerMethodField(read_only=True)
+    id = serializers.IntegerField(read_only=True, source='pk')
+
+    def get_username(self, review):
+        return review.joined.client.user.username
 
     def get_reported(self, review):
         request = self.context.get('request')
         return review.reports.filter(client_id=request.user.id).exists()
 
     class Meta:
-        fields = ['activity_id', 'comment', 'joined_id', 'stars', 'reported']
+        fields = ['id', 'username', 'activity_id', 'comment', 'joined_id', 'stars', 'reported']
         model = ActivityReview
 
 
